@@ -1,8 +1,5 @@
-require('nvim-treesitter').install({
-    "lua", "rust", "toml", "fish", "markdown", "sql", "yaml", "latex",
-    "mermaid", "pem", "dockerfile", "diff", "csv", "ssh_config", "tmux",
-    "vim", "terraform", "proto", "passwd", "git_config", "bash", "comment",
-})
+-- Grammars come precompiled from nix (nvim-treesitter.withAllGrammars),
+-- so no runtime install() here.
 
 vim.api.nvim_create_autocmd('FileType', {
     callback = function()

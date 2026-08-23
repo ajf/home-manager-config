@@ -22,7 +22,6 @@ lib.mkIf pkgs.stdenv.isLinux {
     hyprpaper
     hyprsunset
     dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
-    gcc # nvim treesitter grammar compilation (macOS uses xcode clang)
 
     # Fonts referenced by ghostty/hyprlock (darwin gets these via brew casks)
     nerd-fonts.caskaydia-cove
