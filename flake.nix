@@ -41,6 +41,7 @@
         , desktop ? null
         , genericLinux ? false # set true on non-NixOS Linux (e.g. Arch)
         , identity ? { }
+        , workspace ? { } # dotfiles.workspace: git-workspace providers/tokenRef
         }:
         let
           roleCfg = if role != null then roles.${role} else { };
@@ -66,6 +67,7 @@
                 if desktop != null then desktop
                 else roleCfg.desktop or true;
               dotfiles.identity = identity;
+              dotfiles.workspace = workspace;
             }
           ];
         };

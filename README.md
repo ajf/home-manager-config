@@ -128,6 +128,11 @@ Platform notes:
   bat, eza, and fzf.
 - tmux plugins are nix-managed (tmux-1password and tmux-cargo pinned via
   `fetchFromGitHub`).
+- Project checkouts are managed by `git-workspace` under `~/workspace`
+  (`git-workspace update` clones/syncs everything). Providers and the
+  1Password token reference come from the per-machine flake (`workspace`
+  argument to `mkHome`); a fish wrapper fetches the token via `op read` per
+  invocation, so it never lands on disk.
 - Hyprland uses the Lua config (`config/hypr/hyprland.lua`) with
   DankMaterialShell; the polkit agent and DMS run as systemd user units.
 - Neovim plugins come from `pkgs.vimPlugins` (pinned by the flake, linked at

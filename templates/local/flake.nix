@@ -22,6 +22,15 @@
       #   email = "you@example.com";
       #   signingKey = "key::ssh-ed25519 AAAA...";
       # };
+
+      # git-workspace: `git-workspace update` clones/syncs everything under
+      # ~/workspace. Token comes from 1Password at invocation time.
+      # workspace = {
+      #   providers = [
+      #     { provider = "github"; name = "CHANGEME"; }
+      #   ];
+      #   tokenRef = "op://Personal/GitHub Personal Access Token/token";
+      # };
     };
   };
 }
