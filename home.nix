@@ -9,6 +9,7 @@
     ./modules/tmux.nix
     ./modules/neovim.nix
     ./modules/ghostty.nix
+    ./modules/firefox.nix
     ./modules/linux.nix
     ./modules/darwin.nix
   ];

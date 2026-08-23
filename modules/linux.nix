@@ -37,7 +37,6 @@ lib.mkMerge [
   # Graphical desktops only (Hyprland + DMS)
   (lib.mkIf (pkgs.stdenv.isLinux && desktop) {
     home.packages = with pkgs; [
-      firefox
       foot
       hypridle
       hyprlock
