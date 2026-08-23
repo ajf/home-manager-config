@@ -1,0 +1,16 @@
+[kubernetes]
+disabled = false
+
+[direnv]
+disabled = false
+
+[git_metrics]
+disabled = false
+
+[character]
+success_symbol = "👉"
+vicmd_symbol = "✌️"
+error_symbol = "🚨"
+
+[directory]
+style = "blue bold"

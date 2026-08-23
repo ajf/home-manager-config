@@ -1,0 +1,4 @@
+# DMS runtime state that lands here via the out-of-store symlinks
+config/DankMaterialShell/session.json
+config/DankMaterialShell/*.log
+result
