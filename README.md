@@ -7,8 +7,9 @@ config for NixOS, other Linux (Arch), and macOS.
 
 ```sh
 git clone <this repo> ~/.config/home-manager
-nix run home-manager -- switch --flake ~/.config/home-manager#<name> -b backup
-# afterwards just:
+nix --extra-experimental-features 'nix-command flakes' \
+  run home-manager -- switch --flake ~/.config/home-manager#<name> -b backup
+# afterwards just (flakes are enabled via the managed ~/.config/nix/nix.conf):
 home-manager switch --flake ~/.config/home-manager#<name>
 ```
 
@@ -31,6 +32,39 @@ them when they drift. Machine-local state (monitor layout in
 gitignored: DMS regenerates it per machine. Those links assume the repo is
 checked out at `~/.config/home-manager` (override with the `dotfiles.path`
 option).
+
+## Running without NixOS (Arch, macOS, other Linux)
+
+Only nix itself is required — nothing here depends on NixOS. Use a machine
+entry with `genericLinux = true` on non-NixOS Linux (it wires up session
+vars, XDG paths, and the locale archive).
+
+1. Install nix (multi-user). The [Determinate installer](https://determinate.systems/nix-installer)
+   enables flakes out of the box; with the upstream installer the
+   `--extra-experimental-features` flags in the bootstrap command above cover
+   the first run.
+2. Clone and switch as in Usage, picking the right `machines` entry
+   (`andrew@arch`, `andrew@mac`, `andrew@headless`, …).
+3. Make fish the login shell — home-manager installs it but cannot register
+   it:
+
+   ```sh
+   echo ~/.nix-profile/bin/fish | sudo tee -a /etc/shells
+   chsh -s ~/.nix-profile/bin/fish
+   ```
+
+Platform notes:
+
+- **Arch**: the compositor and session are the distro's job — install
+  `hyprland` (plus a greeter) with pacman; this repo supplies the Hyprland
+  config, DMS, hypridle/hyprlock/hyprpaper, and all CLI tooling. GPU-facing
+  programs generally come from pacman, nix handles the rest.
+- **macOS**: GUI apps and fonts come from Homebrew (`ghostty`, `1password`,
+  nerd-font casks); nix manages their configs and the CLI environment. The
+  systemd units and desktop modules are Linux-gated and simply don't apply.
+- **1Password**: the git signing shim (`~/bin/op-ssh-sign`) probes the
+  standard install locations on NixOS, Arch (`/opt/1Password`), and macOS
+  (`/Applications`), so signing works wherever the app is installed.
 
 ## Per-machine bootstrap (not managed here)
 
