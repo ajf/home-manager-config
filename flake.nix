@@ -13,30 +13,27 @@
 
   outputs = { nixpkgs, nixpkgs-darwin, home-manager, ... }:
     let
-      # One entry per machine/user.
+      # One entry per machine, keyed "username@host" (username is parsed from
+      # the key).
       #   system        - nix system string
-      #   username      - login name on that machine
       #   homeDirectory - override when it isn't /home/<user> or /Users/<user>
       #   desktop       - false for headless machines (no Hyprland/DMS/GUI)
       #   genericLinux  - true on non-NixOS Linux (e.g. Arch)
-      #   identity      - override dotfiles.identity (git name/email/key)
+      #   identity      - override dotfiles.identity (git name/email/key);
+      #                   normally left to the untracked ~/.config/git/identity
       machines = {
         "andrew@intrepid" = {
           system = "x86_64-linux";
-          username = "andrew";
         };
         "andrew@mac" = {
           system = "aarch64-darwin";
-          username = "andrew";
         };
         "andrew@arch" = {
           system = "x86_64-linux";
-          username = "andrew";
           genericLinux = true;
         };
         "andrew@headless" = {
           system = "x86_64-linux";
-          username = "andrew";
           desktop = false;
           genericLinux = true;
         };
@@ -70,8 +67,33 @@
             }
           ];
         };
+      usernameOf = key: builtins.head (nixpkgs.lib.splitString "@" key);
     in
     {
-      homeConfigurations = builtins.mapAttrs (_: mkHome) machines;
+      homeConfigurations =
+        builtins.mapAttrs
+          (key: cfg: mkHome (cfg // { username = usernameOf key; }))
+          machines
+        // {
+          # Generic fallback for machines not in the map; takes everything
+          # from the environment. Requires: home-manager switch --flake
+          # .#current --impure
+          current =
+            let
+              env = name:
+                let v = builtins.getEnv name;
+                in if v == "" then
+                  throw "\"current\" needs --impure (env var ${name} is empty)"
+                else v;
+            in
+            mkHome {
+              system = builtins.currentSystem;
+              username = env "USER";
+              homeDirectory = env "HOME";
+              genericLinux =
+                !(builtins.pathExists /etc/NIXOS)
+                && builtins.match ".*linux.*" builtins.currentSystem != null;
+            };
+        };
     };
 }

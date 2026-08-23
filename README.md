@@ -13,9 +13,12 @@ nix --extra-experimental-features 'nix-command flakes' \
 home-manager switch --flake ~/.config/home-manager#<name>
 ```
 
-`<name>` is a `username@host` entry from `machines` in `flake.nix`; add new
-machines there (system, username, optional homeDirectory / genericLinux /
-`desktop = false` for headless / `identity` to override git name/email/key).
+`<name>` is a `username@host` entry from `machines` in `flake.nix` (username
+is parsed from the entry name); add new machines there (system, optional
+homeDirectory / genericLinux / `desktop = false` for headless / `identity`
+to override git name/email/key). On a machine not in the map,
+`home-manager switch --flake .#current --impure` derives username, home
+directory, and system from the environment.
 
 ## Layout
 
@@ -68,6 +71,21 @@ Platform notes:
 
 ## Per-machine bootstrap (not managed here)
 
+- **Git identity**: personal data is not tracked in this repo. Create
+  `~/.config/git/identity` on each machine (git reads it via an include):
+
+  ```ini
+  [user]
+      name = Your Name
+      email = you@example.com
+      signingkey = key::ssh-ed25519 AAAA...
+  [commit]
+      gpgsign = true
+  ```
+
+  Omit `signingkey`/`gpgsign` on machines without 1Password. Alternatively
+  set `identity = { name = ...; email = ...; signingKey = ...; }` on a
+  machine entry in `flake.nix` to manage it declaratively (tracked in git).
 - **1Password**: system-level install. On NixOS:
   `programs._1password.enable = true; programs._1password-gui.enable = true;`
   in the system config. Git signing uses the `~/bin/op-ssh-sign` shim, which

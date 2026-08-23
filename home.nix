@@ -35,19 +35,25 @@
 
     identity = {
       name = lib.mkOption {
-        type = lib.types.str;
-        default = "Andrew Forgue";
-        description = "Git author name.";
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Git author name. Left null, identity comes from the untracked
+          per-machine file ~/.config/git/identity instead.
+        '';
       };
       email = lib.mkOption {
-        type = lib.types.str;
-        default = "andrew@forgue.io";
-        description = "Git author email.";
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Git author email; null defers to ~/.config/git/identity.";
       };
       signingKey = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
-        default = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO9mWl3pPCPvpbbLZoseNee32Cst2FbV22zJqARVTydn";
-        description = "SSH signing key for git; null disables signing.";
+        default = null;
+        description = ''
+          SSH signing key for git; null defers signing configuration to
+          ~/.config/git/identity.
+        '';
       };
     };
   };
