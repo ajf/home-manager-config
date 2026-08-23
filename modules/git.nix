@@ -29,14 +29,12 @@
     executable = true;
     text = ''
       #!/bin/sh
-      # Locate 1Password's op-ssh-sign across platforms.
-      if command -v op-ssh-sign >/dev/null 2>&1; then
-        exec op-ssh-sign "$@"
-      fi
+      # Locate 1Password's op-ssh-sign across platforms. Absolute paths only:
+      # a PATH lookup would find this shim itself.
       for c in \
+        /run/current-system/sw/bin/op-ssh-sign \
         /opt/1Password/op-ssh-sign \
-        /Applications/1Password.app/Contents/MacOS/op-ssh-sign \
-        /run/current-system/sw/share/1password/op-ssh-sign; do
+        /Applications/1Password.app/Contents/MacOS/op-ssh-sign; do
         [ -x "$c" ] && exec "$c" "$@"
       done
       echo "op-ssh-sign: 1Password not found" >&2
