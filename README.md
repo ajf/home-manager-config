@@ -8,17 +8,22 @@ config for NixOS, other Linux (Arch), and macOS.
 ```sh
 git clone <this repo> ~/.config/home-manager
 nix --extra-experimental-features 'nix-command flakes' \
-  run home-manager -- switch --flake ~/.config/home-manager#<name> -b backup
+  run home-manager -- switch --flake ~/.config/home-manager#<role> --impure -b backup
 # afterwards just (flakes are enabled via the managed ~/.config/nix/nix.conf):
-home-manager switch --flake ~/.config/home-manager#<name>
+home-manager switch --flake ~/.config/home-manager#<role> --impure
 ```
 
-`<name>` is a `username@host` entry from `machines` in `flake.nix` (username
-is parsed from the entry name); add new machines there (system, optional
-homeDirectory / genericLinux / `desktop = false` for headless / `identity`
-to override git name/email/key). On a machine not in the map,
-`home-manager switch --flake .#current --impure` derives username, home
-directory, and system from the environment.
+`<role>` is a machine role from `machines` in `flake.nix`:
+
+- `DMS-desktop` — graphical Linux desktop (Hyprland + DMS), NixOS or not
+- `macos` — darwin: CLI environment + app configs
+- `headless` — servers/VMs: no GUI packages or desktop units
+
+Username, home directory, system, and NixOS-vs-generic-Linux are derived
+from the environment at switch time — hence `--impure` on every invocation.
+Any of them can be pinned per role in `flake.nix` (`username`, `system`,
+`homeDirectory`, `genericLinux`, `identity`), which is also how a
+special-case machine gets its own entry.
 
 ## Layout
 
@@ -38,16 +43,16 @@ option).
 
 ## Running without NixOS (Arch, macOS, other Linux)
 
-Only nix itself is required — nothing here depends on NixOS. Use a machine
-entry with `genericLinux = true` on non-NixOS Linux (it wires up session
-vars, XDG paths, and the locale archive).
+Only nix itself is required — nothing here depends on NixOS. Non-NixOS
+Linux is auto-detected (no `/etc/NIXOS`) and gets `targets.genericLinux`,
+which wires up session vars, XDG paths, and the locale archive.
 
 1. Install nix (multi-user). The [Determinate installer](https://determinate.systems/nix-installer)
    enables flakes out of the box; with the upstream installer the
    `--extra-experimental-features` flags in the bootstrap command above cover
    the first run.
 2. Clone and switch as in Usage, picking the right `machines` entry
-   (`andrew@arch`, `andrew@mac`, `andrew@headless`, …).
+   (`DMS-desktop`, `macos`, `headless`).
 3. Make fish the login shell — home-manager installs it but cannot register
    it:
 
@@ -109,5 +114,6 @@ Platform notes:
   `fetchFromGitHub`).
 - Hyprland uses the Lua config (`config/hypr/hyprland.lua`) with
   DankMaterialShell; the polkit agent and DMS run as systemd user units.
-- Neovim plugins are managed by native `vim.pack` (cloned under
-  `~/.local/share/nvim` on first launch).
+- Neovim plugins come from `pkgs.vimPlugins` (pinned by the flake, linked at
+  `~/.local/share/nvim/site/pack/hm`); config lives in `config/nvim`, and
+  edits to its `lua/` tree take effect after a `home-manager switch`.

@@ -13,87 +13,70 @@
 
   outputs = { nixpkgs, nixpkgs-darwin, home-manager, ... }:
     let
-      # One entry per machine, keyed "username@host" (username is parsed from
-      # the key).
-      #   system        - nix system string
-      #   homeDirectory - override when it isn't /home/<user> or /Users/<user>
+      lib = nixpkgs.lib;
+
+      # Machine ROLES, not machines: username, home directory, system, and
+      # NixOS-vs-generic-Linux are all taken from the environment at switch
+      # time, so every invocation needs --impure:
+      #
+      #   home-manager switch --flake ~/.config/home-manager#<role> --impure
+      #
+      # Per-role (or per-machine, by adding an entry) overrides:
       #   desktop       - false for headless machines (no Hyprland/DMS/GUI)
-      #   genericLinux  - true on non-NixOS Linux (e.g. Arch)
+      #   system        - pin a nix system string (default: current system)
+      #   username      - pin a login name       (default: $USER)
+      #   homeDirectory - pin a home path        (default: $HOME)
+      #   genericLinux  - pin non-NixOS Linux    (default: auto-detect)
       #   identity      - override dotfiles.identity (git name/email/key);
       #                   normally left to the untracked ~/.config/git/identity
       machines = {
-        "andrew@intrepid" = {
-          system = "x86_64-linux";
-        };
-        "andrew@mac" = {
-          system = "aarch64-darwin";
-        };
-        "andrew@arch" = {
-          system = "x86_64-linux";
-          genericLinux = true;
-        };
-        "andrew@headless" = {
-          system = "x86_64-linux";
-          desktop = false;
-          genericLinux = true;
-        };
+        DMS-desktop = { platform = "linux"; }; # graphical Linux desktop: Hyprland + DMS
+        macos = { platform = "darwin"; }; # darwin: CLI environment + app configs
+        headless = { desktop = false; platform = "linux"; }; # servers, VMs, work boxes
       };
 
       mkHome =
-        { system
-        , username
+        { desktop ? true
+        , platform ? null
+        , system ? null
+        , username ? null
         , homeDirectory ? null
-        , desktop ? true
-        , genericLinux ? false
+        , genericLinux ? null
         , identity ? { }
         }:
         let
-          isDarwin = nixpkgs.lib.hasSuffix "darwin" system;
-          pkgs = (if isDarwin then nixpkgs-darwin else nixpkgs).legacyPackages.${system};
+          env = name:
+            let v = builtins.getEnv name;
+            in if v == "" then
+              throw "env var ${name} is empty; run home-manager with --impure"
+            else v;
+
+          rawSys = if system != null then system else builtins.currentSystem;
+          sys =
+            if platform == null || lib.hasSuffix platform rawSys then rawSys
+            else throw "this role is for ${platform}, but the system is ${rawSys}";
+          isDarwin = lib.hasSuffix "darwin" sys;
+          pkgs = (if isDarwin then nixpkgs-darwin else nixpkgs).legacyPackages.${sys};
         in
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./home.nix
             {
-              home.username = username;
+              home.username =
+                if username != null then username else env "USER";
               home.homeDirectory =
-                if homeDirectory != null then homeDirectory
-                else if isDarwin then "/Users/${username}"
-                else "/home/${username}";
-              targets.genericLinux.enable = genericLinux;
+                if homeDirectory != null then homeDirectory else env "HOME";
+              targets.genericLinux.enable =
+                if genericLinux != null then genericLinux
+                else !isDarwin && !(builtins.pathExists /etc/NIXOS);
               dotfiles.desktop.enable = desktop;
               dotfiles.identity = identity;
             }
           ];
         };
-      usernameOf = key: builtins.head (nixpkgs.lib.splitString "@" key);
     in
     {
-      homeConfigurations =
-        builtins.mapAttrs
-          (key: cfg: mkHome (cfg // { username = usernameOf key; }))
-          machines
-        // {
-          # Generic fallback for machines not in the map; takes everything
-          # from the environment. Requires: home-manager switch --flake
-          # .#current --impure
-          current =
-            let
-              env = name:
-                let v = builtins.getEnv name;
-                in if v == "" then
-                  throw "\"current\" needs --impure (env var ${name} is empty)"
-                else v;
-            in
-            mkHome {
-              system = builtins.currentSystem;
-              username = env "USER";
-              homeDirectory = env "HOME";
-              genericLinux =
-                !(builtins.pathExists /etc/NIXOS)
-                && builtins.match ".*linux.*" builtins.currentSystem != null;
-            };
-        };
+      homeConfigurations = builtins.mapAttrs (_: mkHome) machines;
     };
 }
