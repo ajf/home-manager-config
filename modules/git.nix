@@ -4,8 +4,8 @@
   programs.git = {
     enable = true;
 
-    signing = {
-      key = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO9mWl3pPCPvpbbLZoseNee32Cst2FbV22zJqARVTydn";
+    signing = lib.mkIf (config.dotfiles.identity.signingKey != null) {
+      key = config.dotfiles.identity.signingKey;
       signByDefault = true;
       format = "ssh";
       signer = "${config.home.homeDirectory}/bin/op-ssh-sign";
@@ -13,8 +13,8 @@
 
     settings = {
       user = {
-        name = "Andrew Forgue";
-        email = "andrew@forgue.io";
+        name = config.dotfiles.identity.name;
+        email = config.dotfiles.identity.email;
       };
       push.autoSetupRemote = true;
       pull.rebase = true;

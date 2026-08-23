@@ -141,7 +141,9 @@ hl.bind("SUPER + backslash", hl.dsp.exec_cmd("1password --quick-access"))
 -- ==================
 -- SOURCED CONFIGS
 -- ==================
-require("dms.outputs")
+-- outputs is machine-local (written by DMS, gitignored); a fresh machine
+-- has no outputs file until monitors are configured in DMS.
+pcall(require, "dms.outputs")
 require("dms.layout")
 require("dms.cursor")
 require("dms.binds")

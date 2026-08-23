@@ -2,8 +2,10 @@
 
 {
   # On darwin ghostty is installed as an app (brew cask); nix only manages
-  # the config there.
-  home.packages = lib.optionals pkgs.stdenv.isLinux [ pkgs.ghostty ];
+  # the config there. Headless machines get config only, no package.
+  home.packages = lib.optionals
+    (pkgs.stdenv.isLinux && config.dotfiles.desktop.enable)
+    [ pkgs.ghostty ];
 
   xdg.configFile."ghostty/config".source = ../config/ghostty/config;
 

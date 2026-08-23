@@ -9,7 +9,7 @@
 
     # Inlined into the generated ~/.config/nvim/init.lua; the lua/ and after/
     # trees it requires are linked below.
-    extraLuaConfig = builtins.readFile ../config/nvim/init.lua;
+    initLua = builtins.readFile ../config/nvim/init.lua;
 
     plugins = with pkgs.vimPlugins; [
       # shared dependencies

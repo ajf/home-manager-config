@@ -1,4 +1,8 @@
-# DMS runtime state that lands here via the out-of-store symlinks
+# Machine-local state written by DMS through the out-of-store symlinks:
+# monitor layout and settings (contains absolute paths for this machine).
+config/hypr/dms/outputs.lua
+config/hypr/dms/outputs.conf
+config/DankMaterialShell/settings.json
 config/DankMaterialShell/session.json
 config/DankMaterialShell/*.log
 result

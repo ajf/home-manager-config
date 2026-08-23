@@ -13,7 +13,8 @@ home-manager switch --flake ~/.config/home-manager#<name>
 ```
 
 `<name>` is a `username@host` entry from `machines` in `flake.nix`; add new
-machines there (system, username, optional homeDirectory / genericLinux).
+machines there (system, username, optional homeDirectory / genericLinux /
+`desktop = false` for headless / `identity` to override git name/email/key).
 
 ## Layout
 
@@ -25,8 +26,11 @@ machines there (system, username, optional homeDirectory / genericLinux).
 Configs that tools rewrite at runtime (`config/hypr`, `config/DankMaterialShell`,
 `config/ghostty/themes`) and configs that are edited often (`config/nvim`) are
 linked out-of-store: writes land in this repo's worktree — review and commit
-them when they drift. Those links assume the repo is checked out at
-`~/.config/home-manager` (override with the `dotfiles.path` option).
+them when they drift. Machine-local state (monitor layout in
+`config/hypr/dms/outputs.*`, `config/DankMaterialShell/settings.json`) is
+gitignored: DMS regenerates it per machine. Those links assume the repo is
+checked out at `~/.config/home-manager` (override with the `dotfiles.path`
+option).
 
 ## Per-machine bootstrap (not managed here)
 

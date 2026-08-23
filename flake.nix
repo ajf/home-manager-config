@@ -3,16 +3,23 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    # Darwin gets its own branch: same release, better binary-cache coverage.
+    nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, nixpkgs-darwin, home-manager, ... }:
     let
-      # One entry per machine/user. homeDirectory is derived from the platform
-      # unless overridden; genericLinux is for non-NixOS Linux (e.g. Arch).
+      # One entry per machine/user.
+      #   system        - nix system string
+      #   username      - login name on that machine
+      #   homeDirectory - override when it isn't /home/<user> or /Users/<user>
+      #   desktop       - false for headless machines (no Hyprland/DMS/GUI)
+      #   genericLinux  - true on non-NixOS Linux (e.g. Arch)
+      #   identity      - override dotfiles.identity (git name/email/key)
       machines = {
         "andrew@intrepid" = {
           system = "x86_64-linux";
@@ -27,16 +34,25 @@
           username = "andrew";
           genericLinux = true;
         };
+        "andrew@headless" = {
+          system = "x86_64-linux";
+          username = "andrew";
+          desktop = false;
+          genericLinux = true;
+        };
       };
 
       mkHome =
         { system
         , username
         , homeDirectory ? null
+        , desktop ? true
         , genericLinux ? false
+        , identity ? { }
         }:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          isDarwin = nixpkgs.lib.hasSuffix "darwin" system;
+          pkgs = (if isDarwin then nixpkgs-darwin else nixpkgs).legacyPackages.${system};
         in
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
@@ -46,9 +62,11 @@
               home.username = username;
               home.homeDirectory =
                 if homeDirectory != null then homeDirectory
-                else if pkgs.stdenv.isDarwin then "/Users/${username}"
+                else if isDarwin then "/Users/${username}"
                 else "/home/${username}";
               targets.genericLinux.enable = genericLinux;
+              dotfiles.desktop.enable = desktop;
+              dotfiles.identity = identity;
             }
           ];
         };
