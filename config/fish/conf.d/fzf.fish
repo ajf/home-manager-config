@@ -172,7 +172,9 @@ end
 # ─── Environment & misc ─────────────────────────────────────────────────────
 
 # fzf env var inspector
-function fenv --description 'Fuzzy-search environment variables'
+# (named fev, not fenv: NixOS's /etc/fish/config.fish calls the foreign-env
+# plugin as `fenv`, and shadowing it launches this picker at every startup)
+function fev --description 'Fuzzy-search environment variables'
     env \
     | sort \
     | fzf \

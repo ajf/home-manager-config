@@ -252,7 +252,7 @@
   "fontFamily": "Ubuntu Nerd Font",
   "monoFontFamily": "UbuntuMono Nerd Font Mono",
   "fontWeight": 400,
-  "fontScale": 1.01,
+  "fontScale": 1,
   "notepadUseMonospace": true,
   "notepadFontFamily": "",
   "notepadFontSize": 14,
@@ -432,7 +432,8 @@
       "disabled": true
     },
     "desc:Dell Inc. DELL U4025QW 81B3934": {
-      "bitdepth": 10
+      "bitdepth": 10,
+      "disabled": false
     }
   },
   "displayProfiles": {},

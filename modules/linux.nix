@@ -27,10 +27,22 @@ lib.mkIf pkgs.stdenv.isLinux {
     # Fonts referenced by ghostty/hyprlock (darwin gets these via brew casks)
     nerd-fonts.caskaydia-cove
     nerd-fonts.jetbrains-mono
+    nerd-fonts.ubuntu-mono
     inter
   ] ++ dmsDeps;
 
   fonts.fontconfig.enable = true;
+
+  xdg.configFile."foot/foot.ini".source = ../config/foot/foot.ini;
+
+  # A real cursor theme; without one Wayland apps fall back to the legacy
+  # X11 cursor. DMS's cursor setting is left at "System Default".
+  home.pointerCursor = {
+    package = pkgs.adwaita-icon-theme;
+    name = "Adwaita";
+    size = 24;
+    gtk.enable = true;
+  };
 
   # Whole ~/.config/hypr is an out-of-store symlink into this repo: DMS
   # rewrites config/hypr/dms/*.lua at runtime and hyprland.lua edits apply
