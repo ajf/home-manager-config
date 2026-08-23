@@ -5,29 +5,44 @@ config for NixOS, other Linux (Arch), and macOS.
 
 ## Usage
 
+Two flakes: this repo holds the shared configuration and exports
+`lib.mkHome`; a small **untracked per-machine flake** at
+`~/.config/home-manager-local` supplies the personal bits (username, home
+directory, system, git identity) and instantiates a role. Evaluation stays
+pure — no `--impure`.
+
 ```sh
 git clone <this repo> ~/.config/home-manager
+# scaffold the per-machine flake and fill in the CHANGEMEs:
 nix --extra-experimental-features 'nix-command flakes' \
-  run home-manager -- switch --flake ~/.config/home-manager#<role> --impure -b backup
-# afterwards just (flakes are enabled via the managed ~/.config/nix/nix.conf):
-home-manager switch --flake ~/.config/home-manager#<role> --impure
+  flake new -t ~/.config/home-manager ~/.config/home-manager-local
+$EDITOR ~/.config/home-manager-local/flake.nix
+# first switch:
+nix --extra-experimental-features 'nix-command flakes' \
+  run home-manager -- switch --flake ~/.config/home-manager-local -b backup
+# afterwards just:
+hm
 ```
 
-`<role>` is a machine role from `machines` in `flake.nix`:
+`hm` (a managed fish function) re-locks the local flake's `dotfiles` input
+and switches; the re-lock matters because a `path:` input is pinned by
+content hash and would otherwise keep using a stale copy of this repo.
+Naming the local flake's entry `<username>@<hostname>` lets a bare
+`home-manager switch --flake ~/.config/home-manager-local` find it.
+
+Roles (defaults a per-machine flake picks from):
 
 - `DMS-desktop` — graphical Linux desktop (Hyprland + DMS), NixOS or not
 - `macos` — darwin: CLI environment + app configs
 - `headless` — servers/VMs: no GUI packages or desktop units
 
-Username, home directory, system, and NixOS-vs-generic-Linux are derived
-from the environment at switch time — hence `--impure` on every invocation.
-Any of them can be pinned per role in `flake.nix` (`username`, `system`,
-`homeDirectory`, `genericLinux`, `identity`), which is also how a
-special-case machine gets its own entry.
+`mkHome` also accepts `homeDirectory`, `genericLinux` (non-NixOS Linux),
+`desktop`, and `identity` overrides per machine.
 
 ## Layout
 
-- `flake.nix` — machine list
+- `flake.nix` — roles + the `lib.mkHome` constructor
+- `templates/local` — scaffold for the per-machine flake
 - `home.nix` — entry point, cross-platform basics
 - `modules/` — one module per concern (fish, git, tmux, neovim, ghostty, hyprland/DMS…)
 - `config/` — raw config files shipped or symlinked into `~`
@@ -51,7 +66,7 @@ which wires up session vars, XDG paths, and the locale archive.
    enables flakes out of the box; with the upstream installer the
    `--extra-experimental-features` flags in the bootstrap command above cover
    the first run.
-2. Clone and switch as in Usage, picking the right `machines` entry
+2. Clone and switch as in Usage, picking the right role in the local flake
    (`DMS-desktop`, `macos`, `headless`).
 3. Make fish the login shell — home-manager installs it but cannot register
    it:
@@ -89,8 +104,9 @@ Platform notes:
   ```
 
   Omit `signingkey`/`gpgsign` on machines without 1Password. Alternatively
-  set `identity = { name = ...; email = ...; signingKey = ...; }` on a
-  machine entry in `flake.nix` to manage it declaratively (tracked in git).
+  pass `identity = { name = ...; email = ...; signingKey = ...; }` to
+  `mkHome` in the per-machine flake — equally untracked, and declarative.
+  Values set via `mkHome` win over the identity file.
 - **1Password**: system-level install. On NixOS:
   `programs._1password.enable = true; programs._1password-gui.enable = true;`
   in the system config. Git signing uses the `~/bin/op-ssh-sign` shim, which

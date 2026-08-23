@@ -29,4 +29,6 @@
 
   xdg.configFile."fish/functions/fish_ssh_agent.fish".source =
     ../config/fish/functions/fish_ssh_agent.fish;
+  xdg.configFile."fish/functions/hm.fish".source =
+    ../config/fish/functions/hm.fish;
 }
