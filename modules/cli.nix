@@ -20,8 +20,6 @@
     taskwarrior-tui
     tectonic
     mermaid-cli
-    pkgs.sccache
-    pkgs.gcc
     # From the Brewfile, re-add if wanted:
     # vault ansible pssh mutt
   ];
