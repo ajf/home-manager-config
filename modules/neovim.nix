@@ -1,6 +1,15 @@
 { config, lib, pkgs, ... }:
 
 {
+  # nvim-based pager that isn't annoying: renders ANSI colors, passes short
+  # output straight through (cat mode), quits on q.
+  home.packages = [ pkgs.nvimpager ];
+
+  home.sessionVariables = {
+    PAGER = "nvimpager";
+    MANPAGER = "nvim +Man!"; # man pages as proper nvim buffers
+  };
+
   programs.neovim = {
     enable = true;
     defaultEditor = true; # sets $EDITOR = nvim
