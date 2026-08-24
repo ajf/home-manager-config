@@ -20,6 +20,8 @@
     taskwarrior-tui
     tectonic
     mermaid-cli
+    pkgs.sccache
+    pkgs.gcc
     # From the Brewfile, re-add if wanted:
     # vault ansible pssh mutt
   ];
@@ -29,8 +31,6 @@
   programs.fzf.enable = true; # `fzf --fish` integration handled by HM
 
   programs.zoxide.enable = true;
-
-  programs.sccache.enable = true;
 
   programs.direnv = {
     enable = true;
