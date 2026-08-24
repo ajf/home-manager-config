@@ -49,12 +49,15 @@ in
     home.file."${cfg.root}/workspace.toml" =
       lib.mkIf (cfg.providers != [ ]) {
         source = tomlFormat.generate "workspace.toml" {
-          provider = cfg.providers;
+          # `path` (clone subdirectory) is required by git-workspace;
+          # default it to the provider type, e.g. github → ~/workspace/github/…
+          provider = map (p: { path = p.provider; } // p) cfg.providers;
         };
       };
 
     programs.fish.functions.git-workspace =
       lib.mkIf (cfg.tokenRef != null) ''
+        set -q GIT_WORKSPACE; or set -lx GIT_WORKSPACE "${config.home.homeDirectory}/${cfg.root}"
         GITHUB_TOKEN=(op read "${cfg.tokenRef}") command git-workspace $argv
       '';
   };
