@@ -30,6 +30,8 @@
 
   programs.zoxide.enable = true;
 
+  programs.sccache.enable = true;
+
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
