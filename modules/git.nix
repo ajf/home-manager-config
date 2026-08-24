@@ -26,6 +26,13 @@ in
       gpg.format = "ssh";
       gpg.ssh.program = "${config.home.homeDirectory}/bin/op-ssh-sign";
 
+      # Lets `git log --show-signature` verify our own commits (public key
+      # only, derived from the untracked per-machine identity).
+      gpg.ssh.allowedSignersFile =
+        lib.mkIf (id.email != null && id.signingKey != null)
+          "${pkgs.writeText "allowed_signers"
+            "${id.email} ${lib.removePrefix "key::" id.signingKey}\n"}";
+
       push.autoSetupRemote = true;
       pull.rebase = true;
       log.showSignature = true;
