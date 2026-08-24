@@ -4,6 +4,8 @@
   programs.fish = {
     enable = true;
 
+    shellAliases.more = "less";
+
     shellInit = ''
       # NixOS setgid wrappers (op, …) must beat the plain binaries in
       # /run/current-system/sw/bin; sessions started via uwsm/greetd don't
