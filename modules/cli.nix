@@ -11,6 +11,9 @@
     sipcalc
     lazygit
     kubectx
+    # gh as a plain package, NOT programs.gh: the HM module makes config.yml
+    # a read-only store link, which breaks `gh auth login`'s config writes.
+    gh
     zoxide
     rustup
     taskwarrior3
@@ -22,8 +25,6 @@
   ];
 
   programs.bat.enable = true;
-
-  programs.gh.enable = true; # GitHub CLI; also the token source for git-workspace
 
   programs.fzf.enable = true; # `fzf --fish` integration handled by HM
 
