@@ -7,6 +7,15 @@
     shellAliases.more = "less";
 
     shellInit = ''
+      # The desktop session exports __HM_SESS_VARS_SOURCED at login, which
+      # makes every descendant shell skip hm-session-vars — so vars added by
+      # a newer HM generation never appear until re-login. Force-source the
+      # current generation's vars in every fish instead.
+      if test -f ~/.nix-profile/etc/profile.d/hm-session-vars.fish
+          set -e __HM_SESS_VARS_SOURCED
+          source ~/.nix-profile/etc/profile.d/hm-session-vars.fish
+      end
+
       # NixOS setgid wrappers (op, …) must beat the plain binaries in
       # /run/current-system/sw/bin; sessions started via uwsm/greetd don't
       # go through a login shell and lack /run/wrappers/bin entirely.
