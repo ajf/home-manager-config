@@ -4,6 +4,15 @@
   programs.fish = {
     enable = true;
 
+    shellInit = ''
+      # NixOS setgid wrappers (op, …) must beat the plain binaries in
+      # /run/current-system/sw/bin; sessions started via uwsm/greetd don't
+      # go through a login shell and lack /run/wrappers/bin entirely.
+      if test -d /run/wrappers/bin
+          set -gx PATH /run/wrappers/bin (string match -v /run/wrappers/bin $PATH)
+      end
+    '';
+
     interactiveShellInit = ''
       fish_vi_key_bindings
 
