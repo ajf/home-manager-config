@@ -1,0 +1,39 @@
+{
+  "name": "Tokyo Night Moon",
+  "dark": {
+    "name": "Tokyo Night Moon",
+    "primary": "#82aaff",
+    "primaryText": "#1e2030",
+    "primaryContainer": "#394b70",
+    "secondary": "#86e1fc",
+    "surface": "#222436",
+    "surfaceText": "#c8d3f5",
+    "surfaceVariant": "#2f334d",
+    "surfaceVariantText": "#828bb8",
+    "surfaceTint": "#82aaff",
+    "background": "#1e2030",
+    "backgroundText": "#c8d3f5",
+    "outline": "#444a73",
+    "surfaceContainer": "#24273e",
+    "surfaceContainerHigh": "#2a2e4a",
+    "surfaceContainerHighest": "#303556"
+  },
+  "light": {
+    "name": "Tokyo Night Day",
+    "primary": "#2e7de9",
+    "primaryText": "#e1e2e7",
+    "primaryContainer": "#a8aecb",
+    "secondary": "#007197",
+    "surface": "#e1e2e7",
+    "surfaceText": "#3760bf",
+    "surfaceVariant": "#c4c8da",
+    "surfaceVariantText": "#6172b0",
+    "surfaceTint": "#2e7de9",
+    "background": "#d0d5e3",
+    "backgroundText": "#3760bf",
+    "outline": "#a8aecb",
+    "surfaceContainer": "#d5d9e4",
+    "surfaceContainerHigh": "#dcdee9",
+    "surfaceContainerHighest": "#e1e2e7"
+  }
+}
