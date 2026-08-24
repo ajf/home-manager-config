@@ -27,15 +27,15 @@ in
       '';
     };
 
-    tokenRef = lib.mkOption {
+    tokenCommand = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "op://Personal/GitHub Personal Access Token/token";
+      default = "gh auth token";
+      example = "op read 'op://Private/GitHub Personal Access Token/password'";
       description = ''
-        1Password secret reference for the forge token. When set, a fish
-        wrapper fetches it with `op read` per invocation and exports it as
-        GITHUB_TOKEN, so the token never lands on disk or in the session
-        environment.
+        Command whose output is exported as GITHUB_TOKEN for each
+        git-workspace invocation (via a fish wrapper), so the token never
+        lands on disk or in the session environment. Defaults to the gh
+        CLI's stored OAuth token; null disables the wrapper.
       '';
     };
   };
@@ -56,9 +56,9 @@ in
       };
 
     programs.fish.functions.git-workspace =
-      lib.mkIf (cfg.tokenRef != null) ''
+      lib.mkIf (cfg.tokenCommand != null) ''
         set -q GIT_WORKSPACE; or set -lx GIT_WORKSPACE "${config.home.homeDirectory}/${cfg.root}"
-        GITHUB_TOKEN=(op read "${cfg.tokenRef}") command git-workspace $argv
+        GITHUB_TOKEN=(${cfg.tokenCommand}) command git-workspace $argv
       '';
   };
 }

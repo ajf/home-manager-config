@@ -24,12 +24,12 @@
       # };
 
       # git-workspace: `git-workspace update` clones/syncs everything under
-      # ~/workspace. Token comes from 1Password at invocation time.
+      # ~/workspace. Auth defaults to `gh auth token` (run `gh auth login`
+      # once per machine); set workspace.tokenCommand to override.
       # workspace = {
       #   providers = [
       #     { provider = "github"; name = "CHANGEME"; }
       #   ];
-      #   tokenRef = "op://Personal/GitHub Personal Access Token/token";
       # };
     };
   };

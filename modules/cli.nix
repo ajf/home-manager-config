@@ -23,6 +23,8 @@
 
   programs.bat.enable = true;
 
+  programs.gh.enable = true; # GitHub CLI; also the token source for git-workspace
+
   programs.fzf.enable = true; # `fzf --fish` integration handled by HM
 
   programs.zoxide.enable = true;
