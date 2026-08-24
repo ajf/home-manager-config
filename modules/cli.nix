@@ -20,9 +20,14 @@
     taskwarrior-tui
     tectonic
     mermaid-cli
+    podman
     # From the Brewfile, re-add if wanted:
     # vault ansible pssh mutt
   ];
+
+  # -F: quit if output fits one screen; -X: don't clear screen on exit;
+  # -R: pass through ANSI colors
+  home.sessionVariables.LESS = "-FXR";
 
   programs.bat.enable = true;
 
