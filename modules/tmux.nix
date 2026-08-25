@@ -55,14 +55,17 @@ in
     ];
 
     extraConfig = ''
-      set -g update-environment -r
+      # The server starts at boot as a user service, before any graphical or
+      # SSH session exists. On attach, copy these from the attaching client
+      # into the session environment (-a appends to tmux's defaults, which
+      # already cover DISPLAY and the SSH_* variables) so new panes see the
+      # live session's sockets.
+      set -ga update-environment "WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE HYPRCURSOR_THEME HYPRCURSOR_SIZE XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DBUS_SESSION_BUS_ADDRESS"
 
       set -g set-clipboard on
       set -as terminal-features ',*:clipboard'
       bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel "${clip}"
       bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "${clip}"
-
-      set-option -g update-environment "SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION DISPLAY"
 
       # Click a URL to open it in the browser. tmux owns the mouse (mouse on),
       # so foot never sees the click; instead grab the word under the pointer
@@ -83,5 +86,31 @@ in
       bind -T root F3 set prefix None \; set key-table off \; set status-left '#[bg=#C678DD,fg=#2C323C](pass-#S)' \; set status-style bg="#E06C75" \; set window-status-current-style bg=magenta,fg=black \; refresh-client -S;
       bind -T off F3 set -u prefix \; set -u key-table \; set -u status-left \; set -u status-style \; set -u window-status-current-style \; refresh-client -S;
     '';
+  };
+
+  # Run the tmux server as a user service so it survives session teardown.
+  # A server started from a terminal inside the uwsm graphical session lives
+  # in that session's cgroup and is killed when the session ends — linger
+  # only protects user services, not session-scoped processes.
+  systemd.user.services.tmux = lib.mkIf pkgs.stdenv.isLinux {
+    Unit = {
+      Description = "tmux server";
+      # deliberately not tied to graphical-session.target
+      # Never restart on home-manager switch — ExecStop kills the server and
+      # every session in it. New unit versions take effect at next boot.
+      X-RestartIfChanged = "false";
+      X-StopIfChanged = "false";
+    };
+    Service = {
+      Type = "forking";
+      # hm-session-vars puts the socket under XDG_RUNTIME_DIR; the user
+      # manager doesn't inherit that, so pin it here (%t = runtime dir) or
+      # the service would run a second server on /tmp that clients never see.
+      Environment = "TMUX_TMPDIR=%t";
+      ExecStart = "${config.programs.tmux.package}/bin/tmux new-session -d -s main";
+      ExecStop = "${config.programs.tmux.package}/bin/tmux kill-server";
+      Restart = "on-failure";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 }
