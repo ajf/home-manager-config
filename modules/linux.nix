@@ -44,6 +44,7 @@ lib.mkMerge [
       hyprsunset
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
+      obsidian
 
       # Fonts referenced by ghostty/foot/hyprlock (darwin gets these via brew)
       nerd-fonts.caskaydia-cove

@@ -5,6 +5,9 @@ let
 
   tmux-1password = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-1password";
+    # upstream's entry point; mkTmuxPlugin's default guess (tmux_1password.tmux)
+    # doesn't exist, so the plugin silently never loaded
+    rtpFilePath = "plugin.tmux";
     version = "unstable-2024";
     src = pkgs.fetchFromGitHub {
       owner = "yardnsm";
@@ -38,18 +41,15 @@ in
         extraConfig = "set -g @tokyo-night-tmux_theme night";
       }
       tmux-cargo
-      tmux-1password
+      {
+        plugin = tmux-1password;
+        # default key 'u' collides with fzf-tmux-url's default
+        extraConfig = ''set -g @1password-key "P"'';
+      }
       {
         plugin = pkgs.tmuxPlugins.fzf-tmux-url;
         extraConfig = ''
           set -g @fzf-url-fzf-options '-w 50% -h 50% --multi -0 --no-preview --no-border'
-        '';
-      }
-      {
-        plugin = pkgs.tmuxPlugins.t-smart-tmux-session-manager;
-        extraConfig = ''
-          set -g @t-bind "t"
-          set -g @t-fzf-default-results 'sessions'
         '';
       }
     ];
@@ -85,8 +85,38 @@ in
 
       bind -T root F3 set prefix None \; set key-table off \; set status-left '#[bg=#C678DD,fg=#2C323C](pass-#S)' \; set status-style bg="#E06C75" \; set window-status-current-style bg=magenta,fg=black \; refresh-client -S;
       bind -T off F3 set -u prefix \; set -u key-table \; set -u status-left \; set -u status-style \; set -u window-status-current-style \; refresh-client -S;
+
+      # sesh session manager (replaces the deprecated t-smart plugin, same key)
+      # killing a session jumps to the next one instead of detaching
+      set -g detach-on-destroy off
+      bind-key "t" run-shell "sesh connect \"$(
+        sesh list --icons | fzf-tmux -p 80%,70% \
+          --no-sort --ansi --border-label ' sesh ' --prompt '⚡  ' \
+          --header '  ^a all  ^t tmux  ^g configs  ^x zoxide  ^f find  ^d kill' \
+          --bind 'tab:down,btab:up' \
+          --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
+          --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
+          --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)' \
+          --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
+          --bind 'ctrl-f:change-prompt(🔎  )+reload(fd -H -d 2 -t d -E .Trash . ~)' \
+          --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-prompt(⚡  )+reload(sesh list --icons)' \
+          --preview-window 'right:55%' \
+          --preview 'sesh preview {}'
+      )\""
     '';
   };
+
+  home.packages = [ pkgs.sesh ];
+
+  # Predefined sessions: `sesh connect <name>` (or pick in the prefix+t popup)
+  # creates the session in its path and runs startup_command in the first
+  # window. Sessions listed here appear under ^g (configs) in the popup.
+  xdg.configFile."sesh/sesh.toml".text = ''
+    [[session]]
+    name = "dotfiles"
+    path = "~/.config/home-manager"
+    startup_command = "nvim"
+  '';
 
   # Run the tmux server as a user service so it survives session teardown.
   # A server started from a terminal inside the uwsm graphical session lives
