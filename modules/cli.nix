@@ -36,7 +36,12 @@
 
   programs.fzf.enable = true; # `fzf --fish` integration handled by HM
 
-  programs.zoxide.enable = true;
+  programs.zoxide = {
+    enable = true;
+    # take over `cd` (and add `cdi` for interactive fzf picking); plain
+    # paths still work, plus fuzzy jumps to any previously visited dir
+    options = [ "--cmd" "cd" ];
+  };
 
   programs.direnv = {
     enable = true;
