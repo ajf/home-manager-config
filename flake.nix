@@ -42,6 +42,7 @@
         , genericLinux ? false # set true on non-NixOS Linux (e.g. Arch)
         , identity ? { }
         , workspace ? { } # dotfiles.workspace: git-workspace providers/tokenRef
+        , extraModules ? [ ] # per-machine modules from the local flake (untracked config)
         }:
         let
           roleCfg = if role != null then roles.${role} else { };
@@ -69,7 +70,7 @@
               dotfiles.identity = identity;
               dotfiles.workspace = workspace;
             }
-          ];
+          ] ++ extraModules;
         };
     in
     {

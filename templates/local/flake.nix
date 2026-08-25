@@ -31,6 +31,10 @@
       #     { provider = "github"; name = "CHANGEME"; }
       #   ];
       # };
+
+      # Per-machine modules that are too personal for the dotfiles repo
+      # (mail accounts, work-only tools, ...). Plain home-manager modules.
+      # extraModules = [ ./neomutt.nix ];
     };
   };
 }

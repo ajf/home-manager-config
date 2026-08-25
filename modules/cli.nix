@@ -21,8 +21,10 @@
     tectonic
     mermaid-cli
     podman
+    # neomutt config is per-machine (home-manager-local); only the package here
+    neomutt
     # From the Brewfile, re-add if wanted:
-    # vault ansible pssh mutt
+    # vault ansible pssh
   ];
 
   # -F: quit if output fits one screen; -X: don't clear screen on exit;
