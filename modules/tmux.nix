@@ -64,6 +64,16 @@ in
 
       set-option -g update-environment "SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION DISPLAY"
 
+      # Click a URL to open it in the browser. tmux owns the mouse (mouse on),
+      # so foot never sees the click; instead grab the word under the pointer
+      # (or the OSC-8 hyperlink target, if any) and hand it to xdg-open.
+      # Whitespace-only word-separators keep URLs with ?&=; in one piece —
+      # side effect: double-click selects whole whitespace-delimited chunks.
+      set -g word-separators " \t"
+      set -as terminal-features ',foot*:hyperlinks'
+      bind-key -n MouseDown1Pane select-pane -t = \; run-shell -b 'u="#{mouse_hyperlink}"; [ -n "$u" ] || u="#{mouse_word}"; u=$(printf "%s" "$u" | sed "s/[),.;]*$//"); case "$u" in https://*|http://*) xdg-open "$u" >/dev/null 2>&1 ;; www.*) xdg-open "https://$u" >/dev/null 2>&1 ;; esac'
+      bind-key -T copy-mode-vi MouseDown1Pane select-pane \; run-shell -b 'u="#{mouse_hyperlink}"; [ -n "$u" ] || u="#{mouse_word}"; u=$(printf "%s" "$u" | sed "s/[),.;]*$//"); case "$u" in https://*|http://*) xdg-open "$u" >/dev/null 2>&1 ;; www.*) xdg-open "https://$u" >/dev/null 2>&1 ;; esac'
+
       bind-key x kill-pane
 
       set -g default-terminal "''${TERM}"
