@@ -15,6 +15,7 @@
     # a read-only store link, which breaks `gh auth login`'s config writes.
     gh
     zoxide
+    yazi # TUI file manager
     rustup
     taskwarrior3
     taskwarrior-tui
