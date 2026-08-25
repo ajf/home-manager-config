@@ -9,6 +9,11 @@ lib.mkIf (pkgs.stdenv.isLinux && config.dotfiles.desktop.enable) {
     enable = true;
 
     policies = {
+      # 1Password handles passwords; turn off the built-in manager and its
+      # save-login prompts.
+      PasswordManagerEnabled = false;
+      OfferToSaveLogins = false;
+
       ExtensionSettings = {
         # uBlock Origin
         "uBlock0@raymondhill.net" = {
