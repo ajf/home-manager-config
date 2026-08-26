@@ -2,9 +2,7 @@
 
 # ❄️ home-manager-config
 
-**A complete desktop environment — identity sold separately.**
-
-One flake, any machine, no hard-coded *you*.
+** Nix flake for configuring a full desktop environment **
 
 [![NixOS 26.05](https://img.shields.io/badge/NixOS-26.05-5277C3?logo=nixos&logoColor=white)](https://nixos.org)
 [![home-manager](https://img.shields.io/badge/home--manager-release--26.05-41439A?logo=nix&logoColor=white)](https://github.com/nix-community/home-manager)
