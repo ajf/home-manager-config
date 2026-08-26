@@ -1,48 +1,77 @@
-# home-manager configuration
+<div align="center">
 
-Flake-based [home-manager](https://github.com/nix-community/home-manager)
-config for NixOS, other Linux (Arch), and macOS.
+# ❄️ home-manager-config
 
-## Usage
+**A complete desktop environment — identity sold separately.**
 
-This is a base flake that implements my desktop environment but removes all the
-hard-coded identity aspects.  The intent is this is reusable between different
-machines (work login is different) or different people.
+One flake, any machine, no hard-coded *you*.
 
-This should be instantiated by another flake with all the identity information
-in it — scaffold one with `nix flake new -t <this-flake> <dir>`
-(see [`templates/local`](templates/local/flake.nix)). The full contract —
-`mkHome`'s inputs and outputs, and the options an identity flake can set — is
-documented in [`docs/mkHome.md`](docs/mkHome.md).
+[![NixOS 26.05](https://img.shields.io/badge/NixOS-26.05-5277C3?logo=nixos&logoColor=white)](https://nixos.org)
+[![home-manager](https://img.shields.io/badge/home--manager-release--26.05-41439A?logo=nix&logoColor=white)](https://github.com/nix-community/home-manager)
+[![Hyprland](https://img.shields.io/badge/Hyprland-DMS-58E1FF?logo=hyprland&logoColor=white)](https://hypr.land)
+[![platforms](https://img.shields.io/badge/runs%20on-NixOS%20·%20Arch%20·%20macOS-success)](#roles)
+[![flake](https://img.shields.io/badge/flake-pure%2C%20no%20--impure-blueviolet?logo=nix&logoColor=white)](docs/mkHome.md)
+[![license: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 
-## Roles (defaults a per-machine flake picks from)
+</div>
 
-- `DMS-desktop` — graphical Linux desktop (Hyprland + DMS), NixOS or not
-- `macos` — darwin: CLI environment + app configs
-- `headless` — servers/VMs: no GUI packages or desktop units
+---
 
-## Layout
+This flake implements my desktop environment, and nothing personal is
+hard-coded in it. Identity — username, git author, work accounts, machine
+quirks — lives in a separate **identity flake** (yours, untracked, one per
+machine) that has this repo as an input and instantiates it with the personal
+values. The same configuration serves different machines (work login is
+different) or different people.
+
+## ✨ What you get
+
+- 🖥️ **Hyprland + [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell)** — Lua-configured compositor, Material shell, hypridle/hyprlock/hyprpaper
+- 🐟 **fish** with vi bindings, starship prompt, fzf/zoxide/eza/bat wired in
+- ✏️ **neovim** — LSP, treesitter, rust tooling; plugins pinned by the flake
+- 🪟 **tmux** — server runs as a user service that survives logouts; sesh session manager
+- 🔏 **1Password everywhere** — SSH agent, git commit signing, tmux item picker
+- 📦 **git-workspace** — every project checkout cloned and synced under `~/workspace`
+
+## 🚀 Use it
+
+```sh
+git clone https://github.com/ajf/home-manager-config ~/.config/home-manager
+# scaffold your identity flake and fill in the CHANGEMEs:
+nix flake new -t ~/.config/home-manager ~/.config/home-manager-local
+$EDITOR ~/.config/home-manager-local/flake.nix
+# switch:
+nix run home-manager -- switch --flake ~/.config/home-manager-local
+```
+
+The full contract — `mkHome`'s inputs and outputs, the options an identity
+flake can set, and an example identity flake — is documented in
+[`docs/mkHome.md`](docs/mkHome.md).
+
+## 🎭 Roles
+
+Defaults an identity flake picks from:
+
+| Role | For |
+|---|---|
+| `DMS-desktop` | graphical Linux desktop (Hyprland + DMS), NixOS or not |
+| `macos` | darwin: CLI environment + app configs |
+| `headless` | servers/VMs: no GUI packages or desktop units |
+
+## 🗺️ Layout
 
 - `flake.nix` — roles + the `lib.mkHome` constructor
-- `templates/local` — scaffold for the per-machine flake
+- `templates/local` — scaffold for the identity flake
 - `home.nix` — entry point, cross-platform basics
 - `modules/` — one module per concern (fish, git, tmux, neovim, ghostty, hyprland/DMS…)
 - `config/` — raw config files shipped or symlinked into `~`
+- `docs/` — the flake contract ([`mkHome.md`](docs/mkHome.md))
 
-## Running without NixOS (Arch, macOS, other Linux)
+## 📓 Notes
 
-Only nix itself is required — nothing here depends on NixOS. Non-NixOS
-Linux is auto-detected (no `/etc/NIXOS`) and gets `targets.genericLinux`,
-which wires up session vars, XDG paths, and the locale archive.
-
-1. Install nix (multi-user). The [Determinate installer](https://determinate.systems/nix-installer)
-   enables flakes out of the box; with the upstream installer the
-   `--extra-experimental-features` flags in the bootstrap command above cover
-   the first run.
-2. Clone and switch as in Usage, picking the right role in the local flake
-   (`DMS-desktop`, `macos`, `headless`).
-
-## Notes
-
-- Neovim and Tmux plugins are managed by `home-manager`, not their native
+- Runs on non-NixOS too: only nix itself is required. Non-NixOS Linux is
+  auto-detected and gets `targets.genericLinux` (session vars, XDG paths,
+  locale archive). On macOS, GUI apps come from Homebrew; nix manages their
+  configs and the CLI environment.
+- Neovim and tmux plugins are managed by `home-manager`, not their native
   package managers.
