@@ -45,6 +45,8 @@ lib.mkMerge [
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
       obsidian
+      slack
+      teams-for-linux # official Linux client is discontinued; Electron wrapper
 
       # Fonts referenced by ghostty/foot/hyprlock (darwin gets these via brew)
       nerd-fonts.caskaydia-cove
