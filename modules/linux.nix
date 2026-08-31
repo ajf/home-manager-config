@@ -3,6 +3,22 @@
 let
   desktop = config.dotfiles.desktop.enable;
 
+  # 2.18.0 fixes the WebAuthn "security window" for passkey/security-key
+  # sign-in (upstream #802); drop this override once nixpkgs catches up.
+  teams-for-linux' = pkgs.teams-for-linux.overrideAttrs (old: rec {
+    version = "2.18.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "IsmaelMartinez";
+      repo = "teams-for-linux";
+      tag = "v${version}";
+      hash = "sha256-Rw/NYfpwNQENCEHUzKQZWrM+nxvC3rCCtXnBZmQjIz4=";
+    };
+    npmDeps = pkgs.fetchNpmDeps {
+      inherit src;
+      hash = "sha256-MhaUtGkIoutibiu8Flmr8QqqxSEbI8gUJE4WuX9/1Ho=";
+    };
+  });
+
   # Tools DMS shells out to (quickshell as `qs`, plus theming/screenshot/etc.)
   dmsDeps = with pkgs; [
     quickshell
@@ -47,7 +63,8 @@ lib.mkMerge [
       cider-2 # Apple Music client
       obsidian
       slack
-      teams-for-linux # official Linux client is discontinued; Electron wrapper
+      teams-for-linux' # official Linux client is discontinued; Electron wrapper
+      libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
 
       # Fonts referenced by ghostty/foot/hyprlock (darwin gets these via brew)
       nerd-fonts.caskaydia-cove
@@ -59,6 +76,11 @@ lib.mkMerge [
     fonts.fontconfig.enable = true;
 
     xdg.configFile."foot/foot.ini".source = ../config/foot/foot.ini;
+
+    # Security-key (WebAuthn) sign-in is opt-in; see the override comment above.
+    xdg.configFile."teams-for-linux/config.json".text = builtins.toJSON {
+      auth.webauthn.enabled = true;
+    };
 
     # A real cursor theme; without one Wayland apps fall back to the legacy
     # X11 cursor. DMS's cursor setting is left at "System Default".
