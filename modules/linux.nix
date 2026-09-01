@@ -61,6 +61,11 @@ lib.mkMerge [
 
     xdg.configFile."fish/conf.d/ssh-auth-sock.fish".source =
       ../config/fish/conf.d/ssh-auth-sock.fish;
+
+    # doas doesn't carry root's NIX_PATH, so a bare `doas nixos-rebuild`
+    # can't find the nixos channel; this wrapper pins it explicitly.
+    xdg.configFile."fish/functions/nixos-rebuild.fish".source =
+      ../config/fish/functions/nixos-rebuild.fish;
   })
 
   # Graphical desktops only (Hyprland + DMS)
