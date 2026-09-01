@@ -74,6 +74,7 @@ lib.mkMerge [
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
       cider-2' # Apple Music client; wrapped with libpulse (see above)
+      kdePackages.kasts # podcast player
       obsidian
       slack
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
