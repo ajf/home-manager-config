@@ -19,6 +19,19 @@ let
     };
   });
 
+  # nixpkgs wraps cider-2 with libglvnd only; without libpulse Chromium's
+  # audio service silently falls back to its fake null backend (playback
+  # "works" but no sound). Drop once nixpkgs adds libpulseaudio itself.
+  cider-2' = pkgs.symlinkJoin {
+    name = "cider-2-with-libpulse";
+    paths = [ pkgs.cider-2 ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/cider-2 \
+        --prefix LD_LIBRARY_PATH : ${pkgs.libpulseaudio}/lib
+    '';
+  };
+
   # Tools DMS shells out to (quickshell as `qs`, plus theming/screenshot/etc.)
   dmsDeps = with pkgs; [
     quickshell
@@ -60,7 +73,7 @@ lib.mkMerge [
       hyprsunset
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
-      cider-2 # Apple Music client
+      cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
