@@ -78,6 +78,7 @@ lib.mkMerge [
       hyprsunset
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
+      kdePackages.okular # PDF reader
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
