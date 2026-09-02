@@ -112,9 +112,11 @@ hl.bind(M .. " + CTRL + mouse_down", hl.dsp.window.move({ workspace = "e+1" }))
 hl.bind(M .. " + CTRL + mouse_up",   hl.dsp.window.move({ workspace = "e-1" }))
 
 -- === Numbered Workspaces ===
+-- Move-window is on CTRL (matching the CTRL+mouse binds above); SHIFT+number
+-- is reserved for the macOS-style screenshot binds below.
 for i = 1, 9 do
     hl.bind(M .. " + " .. i,         hl.dsp.focus({ workspace = i }))
-    hl.bind(M .. " + SHIFT + " .. i, hl.dsp.window.move({ workspace = i }))
+    hl.bind(M .. " + CTRL + " .. i,  hl.dsp.window.move({ workspace = i }))
 end
 
 -- === Column Management ===
@@ -139,10 +141,10 @@ hl.bind(M .. " + code:21", hl.dsp.window.resize({ x = 100, y = 0 }),  { descript
 --hl.bind(M .. " + SHIFT + minus", hl.dsp.window.resize({ x = 0, y = "-10%" }),  { repeating = true })
 --hl.bind(M .. " + SHIFT + equal", hl.dsp.window.resize({ x = 0, y = "10%" }),   { repeating = true })
 
--- === Screenshots ===
-hl.bind(M .. " + CTRL + 3", hl.dsp.exec_cmd("dms screenshot full"))
-hl.bind(M .. " + CTRL + 4", hl.dsp.exec_cmd("dms screenshot"))
-hl.bind(M .. " + CTRL + 5", hl.dsp.exec_cmd("dms screenshot window"))
+-- === Screenshots (macOS keys, Super for Cmd) ===
+hl.bind(M .. " + SHIFT + 3", hl.dsp.exec_cmd("dms screenshot full"))
+hl.bind(M .. " + SHIFT + 4", hl.dsp.exec_cmd("dms screenshot"))
+hl.bind(M .. " + SHIFT + 5", hl.dsp.exec_cmd("dms screenshot window"))
 
 -- === System Controls ===
 hl.bind(M .. " + SHIFT + P", hl.dsp.dpms("toggle"))
