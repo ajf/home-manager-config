@@ -21,6 +21,11 @@ end)
 hl.env("LIBVA_DRIVER_NAME",         "nvidia")
 hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 
+-- Without a theme Qt auto-picks gtk3, whose in-process file chooser aborts
+-- on missing GSettings schemas (Okular SIGABRT on Open). The portal theme
+-- ships with qtbase and delegates dialogs to xdg-desktop-portal-gtk.
+hl.env("QT_QPA_PLATFORMTHEME", "xdgdesktopportal")
+
 -- ==================
 -- INPUT CONFIG
 -- ==================
