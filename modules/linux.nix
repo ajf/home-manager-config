@@ -124,6 +124,22 @@ lib.mkMerge [
     # Polkit auth agent (replaces the old mate-polkit exec-once)
     services.hyprpolkitagent.enable = true;
 
+    # hypridle as a user unit (auto-restart on crash) instead of a bare
+    # exec from hyprland.lua; overrides the unit shipped in the package.
+    systemd.user.services.hypridle = {
+      Unit = {
+        Description = "Hyprland's idle daemon";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+        ConditionEnvironment = "WAYLAND_DISPLAY";
+      };
+      Service = {
+        ExecStart = "${pkgs.hypridle}/bin/hypridle";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+
     # DMS bar/shell, bound to the graphical session (mirrors the unit shipped
     # in the dms-shell package).
     systemd.user.services.dms = {
