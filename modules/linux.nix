@@ -73,7 +73,6 @@ lib.mkMerge [
     home.packages = with pkgs; [
       foot
       hypridle
-      hyprlock
       hyprpaper
       hyprsunset
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
@@ -85,7 +84,7 @@ lib.mkMerge [
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
 
-      # Fonts referenced by ghostty/foot/hyprlock (darwin gets these via brew)
+      # Fonts referenced by ghostty/foot (darwin gets these via brew)
       nerd-fonts.caskaydia-cove
       nerd-fonts.jetbrains-mono
       nerd-fonts.ubuntu-mono

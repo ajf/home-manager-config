@@ -24,7 +24,7 @@ different) or different people.
 
 ## ✨ What you get
 
-- 🖥️ **Hyprland + [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell)** — Lua-configured compositor, Material shell, hypridle/hyprlock/hyprpaper
+- 🖥️ **Hyprland + [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell)** — Lua-configured compositor, Material shell, hypridle/hyprpaper
 - 🐟 **fish** with vi bindings, starship prompt, fzf/zoxide/eza/bat wired in
 - ✏️ **neovim** — LSP, treesitter, rust tooling; plugins pinned by the flake
 - 🪟 **tmux** — server runs as a user service that survives logouts; sesh session manager
