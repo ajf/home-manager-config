@@ -24,6 +24,12 @@ in
       default = null;
       description = "Root CA certificate (PEM), written to ~/.step/certs/root_ca.crt.";
     };
+    sshProvisioner = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "kanidm";
+      description = "Provisioner passed to `step ssh login` by the step-ssh-login function.";
+    };
   };
 
   config = {
@@ -42,5 +48,23 @@ in
     home.file.".step/certs/root_ca.crt" = lib.mkIf (cfg.rootCert != null) {
       text = cfg.rootCert;
     };
+
+    # Desktop machines only: loads an SSH cert into the agent ssh actually
+    # authenticates with — the systemd agent unit on Linux, the launchd
+    # default agent on darwin. (1Password's agent can't hold certificates,
+    # and interactive shells may point SSH_AUTH_SOCK at it.)
+    programs.fish.functions.step-ssh-login =
+      lib.mkIf (cfg.caUrl != null && config.dotfiles.desktop.enable) (
+        (if pkgs.stdenv.isDarwin then ''
+          set -l sock (launchctl getenv SSH_AUTH_SOCK)
+          test -n "$sock"; or set sock $SSH_AUTH_SOCK
+        '' else ''
+          set -l sock $XDG_RUNTIME_DIR/ssh-agent.socket
+        '') + ''
+          SSH_AUTH_SOCK=$sock step ssh login ${config.home.username}${
+            lib.optionalString (cfg.sshProvisioner != null)
+              " --provisioner ${cfg.sshProvisioner}"} $argv
+        ''
+      );
   };
 }
