@@ -3,6 +3,8 @@
 {
   imports = [
     ./modules/cli.nix
+    ./modules/ssh.nix
+    ./modules/step.nix
     ./modules/workspace.nix
     ./modules/fish.nix
     ./modules/git.nix
