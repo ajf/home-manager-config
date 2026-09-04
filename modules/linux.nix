@@ -46,9 +46,19 @@ let
 in
 lib.mkMerge [
 
-  # All Linux machines, headless included
-  (lib.mkIf pkgs.stdenv.isLinux {
-    # ssh-agent on a fixed socket; fish's ssh-auth-sock.fish expects this path.
+  # NixOS only (genericLinux covers Arch and friends, where this makes no sense)
+  (lib.mkIf (pkgs.stdenv.isLinux && !config.targets.genericLinux.enable) {
+    # doas doesn't carry root's NIX_PATH, so a bare `doas nixos-rebuild`
+    # can't find the nixos channel; this wrapper pins it explicitly.
+    xdg.configFile."fish/functions/nixos-rebuild.fish".source =
+      ../config/fish/functions/nixos-rebuild.fish;
+  })
+
+  # Graphical desktops only (Hyprland + DMS)
+  (lib.mkIf (pkgs.stdenv.isLinux && desktop) {
+    # Local ssh-agent is a desktop affair (1Password preferred, this unit as
+    # fallback). Headless machines rely on forwarded agents, which the fish
+    # snippet below would otherwise clobber with a dead socket path.
     systemd.user.services.ssh-agent = {
       Unit.Description = "SSH key agent";
       Service = {
@@ -62,18 +72,6 @@ lib.mkMerge [
     xdg.configFile."fish/conf.d/ssh-auth-sock.fish".source =
       ../config/fish/conf.d/ssh-auth-sock.fish;
 
-  })
-
-  # NixOS only (genericLinux covers Arch and friends, where this makes no sense)
-  (lib.mkIf (pkgs.stdenv.isLinux && !config.targets.genericLinux.enable) {
-    # doas doesn't carry root's NIX_PATH, so a bare `doas nixos-rebuild`
-    # can't find the nixos channel; this wrapper pins it explicitly.
-    xdg.configFile."fish/functions/nixos-rebuild.fish".source =
-      ../config/fish/functions/nixos-rebuild.fish;
-  })
-
-  # Graphical desktops only (Hyprland + DMS)
-  (lib.mkIf (pkgs.stdenv.isLinux && desktop) {
     home.packages = with pkgs; [
       foot
       hypridle
