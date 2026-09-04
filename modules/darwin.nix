@@ -6,6 +6,10 @@ lib.mkIf pkgs.stdenv.isDarwin {
   # and fonts into ~/Library/Fonts.
   home.packages = with pkgs; [
     mas # App Store CLI (Safari extensions, iWork, ...)
+    # macOS ships bash 3.2; anything `#!/usr/bin/env bash` with modern
+    # bashisms (tokyo-night-tmux's associative arrays, for one) needs this.
+    # Linux systems already have a current bash.
+    bash
   ]
   # the whole nerd-fonts family (what the old Brewfile's font casks were)
   ++ lib.filter lib.isDerivation (lib.attrValues pkgs.nerd-fonts);
