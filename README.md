@@ -69,7 +69,8 @@ Defaults an identity flake picks from:
 
 - Runs on non-NixOS too: only nix itself is required. Non-NixOS Linux is
   auto-detected and gets `targets.genericLinux` (session vars, XDG paths,
-  locale archive). On macOS, GUI apps come from Homebrew; nix manages their
-  configs and the CLI environment.
+  locale archive). On macOS everything comes from nix too — apps are linked
+  into `~/Applications/Home Manager Apps`, fonts into `~/Library/Fonts`;
+  Homebrew is retired.
 - Neovim and tmux plugins are managed by `home-manager`, not their native
   package managers.

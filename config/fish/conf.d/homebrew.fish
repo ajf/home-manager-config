@@ -1,13 +1,12 @@
-fish_add_path /opt/homebrew/bin
+# Transitional: Homebrew is being retired in favor of nix. While it's still
+# installed keep its paths/completions available — appended, so nix wins any
+# conflict. No-ops entirely once brew is gone.
+if test -x /opt/homebrew/bin/brew
+    fish_add_path --append /opt/homebrew/bin
 
-if test -d (brew --prefix)"/share/fish/completions"
-    set -p fish_complete_path (brew --prefix)/share/fish/completions
-else
-    echo "No homebrew completions"
-end
-
-if test -d (brew --prefix)"/share/fish/vendor_completions.d"
-    set -p fish_complete_path (brew --prefix)/share/fish/vendor_completions.d
-else
-    echo "No homebrew vendor completions"
+    for d in /opt/homebrew/share/fish/completions /opt/homebrew/share/fish/vendor_completions.d
+        if test -d $d
+            set -a fish_complete_path $d
+        end
+    end
 end

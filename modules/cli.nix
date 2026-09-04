@@ -22,10 +22,6 @@
     tectonic
     mermaid-cli
     podman
-    # terminfo for the terminals we ssh in from (ssh sends TERM with the pty
-    # request; headless boxes just need the entries to exist remotely)
-    foot.terminfo # TERM=foot / foot-direct
-    ghostty.terminfo # TERM=xterm-ghostty
 
     # neomutt/senpai configs are per-machine (identity repo); packages only here
     neomutt
@@ -33,6 +29,14 @@
     senpai # IRC client
     # From the Brewfile, re-add if wanted:
     # vault ansible pssh
+  ]
+  # terminfo for the terminals we ssh in from (ssh sends TERM with the pty
+  # request; headless boxes just need the entries to exist remotely).
+  # linux-only: the packages don't evaluate on darwin, and the mac is the
+  # machine we ssh FROM, not into.
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    pkgs.foot.terminfo # TERM=foot / foot-direct
+    pkgs.ghostty.terminfo # TERM=xterm-ghostty
   ];
 
   # -F: quit if output fits one screen; -X: don't clear screen on exit;
