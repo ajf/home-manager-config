@@ -62,6 +62,10 @@ lib.mkMerge [
     xdg.configFile."fish/conf.d/ssh-auth-sock.fish".source =
       ../config/fish/conf.d/ssh-auth-sock.fish;
 
+  })
+
+  # NixOS only (genericLinux covers Arch and friends, where this makes no sense)
+  (lib.mkIf (pkgs.stdenv.isLinux && !config.targets.genericLinux.enable) {
     # doas doesn't carry root's NIX_PATH, so a bare `doas nixos-rebuild`
     # can't find the nixos channel; this wrapper pins it explicitly.
     xdg.configFile."fish/functions/nixos-rebuild.fish".source =
@@ -152,7 +156,9 @@ lib.mkMerge [
       Service = {
         Type = "dbus";
         BusName = "org.freedesktop.Notifications";
-        Environment = "PATH=${lib.makeBinPath dmsDeps}:/run/current-system/sw/bin:%h/.nix-profile/bin";
+        # System dirs cover both NixOS (/run/current-system) and generic
+        # Linux (/usr/bin); missing entries are harmless.
+        Environment = "PATH=${lib.makeBinPath dmsDeps}:/run/current-system/sw/bin:%h/.nix-profile/bin:/usr/bin:/bin";
         ExecStart = "${pkgs.dms-shell}/bin/dms run --session";
         ExecReload = "${pkgs.procps}/bin/pkill -USR1 -x dms";
         Restart = "on-failure";
@@ -161,16 +167,5 @@ lib.mkMerge [
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };
-
-    xdg.dataFile."applications/factorio.desktop".text = ''
-      [Desktop Entry]
-      Version=1.0
-      Type=Application
-      Name=Factorio
-      Comment=Factorio
-      Icon=${config.home.homeDirectory}/games/factorio/data/base/thumbnail.png
-      Exec=${config.home.homeDirectory}/games/factorio/bin/x64/factorio
-      Categories=Game;
-    '';
   })
 ]

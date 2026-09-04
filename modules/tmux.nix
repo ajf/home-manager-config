@@ -2,6 +2,7 @@
 
 let
   clip = if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy";
+  opener = if pkgs.stdenv.isDarwin then "open" else "xdg-open";
 
   tmux-1password = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-1password";
@@ -74,8 +75,8 @@ in
       # side effect: double-click selects whole whitespace-delimited chunks.
       set -g word-separators " \t"
       set -as terminal-features ',foot*:hyperlinks'
-      bind-key -n MouseDown1Pane select-pane -t = \; run-shell -b 'u="#{mouse_hyperlink}"; [ -n "$u" ] || u="#{mouse_word}"; u=$(printf "%s" "$u" | sed "s/[),.;]*$//"); case "$u" in https://*|http://*) xdg-open "$u" >/dev/null 2>&1 ;; www.*) xdg-open "https://$u" >/dev/null 2>&1 ;; esac'
-      bind-key -T copy-mode-vi MouseDown1Pane select-pane \; run-shell -b 'u="#{mouse_hyperlink}"; [ -n "$u" ] || u="#{mouse_word}"; u=$(printf "%s" "$u" | sed "s/[),.;]*$//"); case "$u" in https://*|http://*) xdg-open "$u" >/dev/null 2>&1 ;; www.*) xdg-open "https://$u" >/dev/null 2>&1 ;; esac'
+      bind-key -n MouseDown1Pane select-pane -t = \; run-shell -b 'u="#{mouse_hyperlink}"; [ -n "$u" ] || u="#{mouse_word}"; u=$(printf "%s" "$u" | sed "s/[),.;]*$//"); case "$u" in https://*|http://*) ${opener} "$u" >/dev/null 2>&1 ;; www.*) ${opener} "https://$u" >/dev/null 2>&1 ;; esac'
+      bind-key -T copy-mode-vi MouseDown1Pane select-pane \; run-shell -b 'u="#{mouse_hyperlink}"; [ -n "$u" ] || u="#{mouse_word}"; u=$(printf "%s" "$u" | sed "s/[),.;]*$//"); case "$u" in https://*|http://*) ${opener} "$u" >/dev/null 2>&1 ;; www.*) ${opener} "https://$u" >/dev/null 2>&1 ;; esac'
 
       bind-key x kill-pane
 
@@ -114,7 +115,7 @@ in
   xdg.configFile."sesh/sesh.toml".text = ''
     [[session]]
     name = "dotfiles"
-    path = "~/.config/home-manager"
+    path = "${config.dotfiles.path}"
     startup_command = "nvim"
   '';
 
