@@ -18,8 +18,9 @@ end)
 -- ==================
 -- ENVIRONMENT VARIABLES
 -- ==================
-hl.env("LIBVA_DRIVER_NAME",         "nvidia")
-hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+-- GPU/driver-specific env (LIBVA_DRIVER_NAME etc.) is machine-local: the
+-- identity repo's gpu.nix exports it via ~/.config/uwsm/env, which uwsm
+-- sources before launching the compositor.
 
 -- Without a theme Qt auto-picks gtk3, whose in-process file chooser aborts
 -- on missing GSettings schemas (Okular SIGABRT on Open). The portal theme
