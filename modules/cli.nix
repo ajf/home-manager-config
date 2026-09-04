@@ -22,6 +22,11 @@
     tectonic
     mermaid-cli
     podman
+    # terminfo for the terminals we ssh in from (ssh sends TERM with the pty
+    # request; headless boxes just need the entries to exist remotely)
+    foot.terminfo # TERM=foot / foot-direct
+    ghostty.terminfo # TERM=xterm-ghostty
+
     # neomutt/senpai configs are per-machine (identity repo); packages only here
     neomutt
     w3m # HTML rendering for neomutt's mailcap
