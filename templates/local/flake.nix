@@ -1,8 +1,11 @@
 {
   description = "Per-machine home-manager identity (not tracked in the dotfiles repo)";
 
-  # Point at your dotfiles checkout (or its git URL).
-  inputs.dotfiles.url = "path:/home/CHANGEME/.config/home-manager";
+  # Pin the dotfiles repo; iterate on a local checkout with
+  #   home-manager switch --flake <this-dir> \
+  #     --override-input dotfiles path:$HOME/.config/home-manager
+  # (the `hm` fish function does exactly that).
+  inputs.dotfiles.url = "github:CHANGEME/home-manager-config";
 
   outputs = { dotfiles, ... }: {
     # Name the entry "<username>@<hostname>" and a bare

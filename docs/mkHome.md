@@ -40,7 +40,7 @@ riding along as `extraModules`:
 {
   description = "Per-machine home-manager identity (examplebox)";
 
-  inputs.dotfiles.url = "path:/home/alice/.config/home-manager";
+  inputs.dotfiles.url = "github:alice/home-manager-config";
 
   outputs = { dotfiles, ... }: {
     homeConfigurations."alice@examplebox" = dotfiles.lib.mkHome {
@@ -78,9 +78,17 @@ riding along as `extraModules`:
 | `dotfiles.workspace.providers` | `[ ]` | Provider entries for `workspace.toml`, e.g. `{ provider = "github"; name = "you"; }` |
 | `dotfiles.workspace.tokenCommand` | `"gh auth token"` | Command whose output becomes `GITHUB_TOKEN` per git-workspace run; `null` disables the wrapper |
 
-## Consuming with a `path:` input
+## Local iteration
 
-An identity flake that points at a local checkout
-(`inputs.dotfiles.url = "path:..."`) pins it by content hash: edits here are
-invisible until the lock is refreshed. Run `nix flake update dotfiles` in the
-identity flake before switching (the `hm` fish function does both).
+The identity flake pins `dotfiles` to a github rev; a plain
+`home-manager switch` reproduces that rev everywhere. To build from the
+local checkout instead (absolute `path:` inputs can't be shared across
+machines, and relative ones don't survive the store copy), override the
+input at switch time — the `hm` fish function does exactly this:
+
+```sh
+home-manager switch --flake ~/.config/home-manager-local \
+  --override-input dotfiles path:$HOME/.config/home-manager
+```
+
+Push and `nix flake update dotfiles` to move the pin.

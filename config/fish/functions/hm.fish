@@ -1,6 +1,6 @@
-function hm --description 'Refresh dotfiles input and switch home-manager (pure, two-flake setup)'
-    # The local flake locks the dotfiles path input by content hash, so it
-    # must be re-locked to pick up edits to ~/.config/home-manager.
-    nix flake update dotfiles --flake ~/.config/home-manager-local
-    and home-manager switch --flake ~/.config/home-manager-local $argv
+function hm --description 'Switch home-manager from the local dotfiles checkout'
+    # The identity flake pins dotfiles to a github rev; iterate on the
+    # local checkout by overriding that input (pure, no lock rewrite).
+    home-manager switch --flake ~/.config/home-manager-local \
+        --override-input dotfiles path:$HOME/.config/home-manager $argv
 end
