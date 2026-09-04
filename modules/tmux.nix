@@ -80,7 +80,11 @@ in
 
       bind-key x kill-pane
 
-      set -g default-terminal "''${TERM}"
+      # NOT "$TERM": the server starts from a systemd unit where TERM is unset,
+      # so inheriting yields TERM='' in every pane (colorless fish/starship,
+      # locally and over ssh). tmux-256color is the canonical value inside tmux;
+      # tmux still learns the outer terminal's tricks from the attaching client.
+      set -g default-terminal "tmux-256color"
       set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'  # undercurl support
       set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'  # underscore colours - needs tmux-3.0
 
