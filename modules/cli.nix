@@ -22,8 +22,10 @@
     tectonic
     mermaid-cli
     podman
-    # neomutt config is per-machine (home-manager-local); only the package here
+    # neomutt/senpai configs are per-machine (identity repo); packages only here
     neomutt
+    w3m # HTML rendering for neomutt's mailcap
+    senpai # IRC client
     # From the Brewfile, re-add if wanted:
     # vault ansible pssh
   ];
