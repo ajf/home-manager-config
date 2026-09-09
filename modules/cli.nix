@@ -22,6 +22,7 @@
     tectonic
     mermaid-cli
     podman
+    ipmitool
 
     # neomutt/senpai configs are per-machine (identity repo); packages only here
     neomutt
@@ -42,6 +43,10 @@
   # -F: quit if output fits one screen; -X: don't clear screen on exit;
   # -R: pass through ANSI colors
   home.sessionVariables.LESS = "-FXR";
+
+  # procps-ng (ps/top/pgrep): never show kernel threads. Also set system-wide
+  # on the NixOS fleet; this follows the user to any other machine.
+  home.sessionVariables.LIBPROC_HIDE_KERNEL = "1";
 
   programs.bat.enable = true;
 
