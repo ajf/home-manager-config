@@ -85,7 +85,14 @@ in
       # fish/starship, locally and over ssh). tmux-256color is the canonical
       # value inside tmux; tmux still learns the outer terminal's tricks from
       # the attaching client.
-      set -g default-terminal "tmux-256color"
+      # tmux-direct (not tmux-256color): its terminfo carries the RGB
+      # capability, which apps like neomutt CHECK before accepting hex
+      # colors — declaring RGB via terminal-features alone doesn't help
+      # them. Plus: tell tmux the outer terminals really do truecolor,
+      # or it quietly downconverts to 256.
+      set -g default-terminal "tmux-direct"
+      set -as terminal-features ',foot*:RGB'
+      set -as terminal-features ',xterm-ghostty:RGB'
       set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'  # undercurl support
       set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'  # underscore colours - needs tmux-3.0
 
