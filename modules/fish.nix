@@ -51,4 +51,6 @@
     ../config/fish/functions/fish_ssh_agent.fish;
   xdg.configFile."fish/functions/hm.fish".source =
     ../config/fish/functions/hm.fish;
+  xdg.configFile."fish/functions/hm-pull.fish".source =
+    ../config/fish/functions/hm-pull.fish;
 }
