@@ -19,10 +19,13 @@ lib.mkIf pkgs.stdenv.isDarwin {
   xdg.configFile."fish/conf.d/homebrew.fish".source =
     ../config/fish/conf.d/homebrew.fish;
 
-  # 1Password holds the SSH keys (darwin equivalent of the Linux desktop's
-  # ssh-auth-sock.fish).
-  xdg.configFile."fish/conf.d/1password-agent.fish".source =
-    ../config/fish/conf.d/1password-agent.fish;
+  # Unlike the Linux desktop (ssh-auth-sock.fish prefers 1Password), the
+  # shell default here is the launchd cert agent so bare `step ssh login`
+  # and friends land creds in it; 1Password still serves regular keys via
+  # IdentityAgent in the identity flake's ~/.ssh/config.
+  xdg.configFile."fish/conf.d/ssh-auth-sock.fish".text = ''
+    set -gx SSH_AUTH_SOCK "${config.dotfiles.ssh.certAgentSocket}"
+  '';
 
   # Cert-holding ssh-agent on a stable socket — darwin twin of linux.nix's
   # systemd unit (launchd's own agent has an unpredictable socket path, and
