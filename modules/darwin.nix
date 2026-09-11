@@ -23,4 +23,21 @@ lib.mkIf pkgs.stdenv.isDarwin {
   # ssh-auth-sock.fish).
   xdg.configFile."fish/conf.d/1password-agent.fish".source =
     ../config/fish/conf.d/1password-agent.fish;
+
+  # Cert-holding ssh-agent on a stable socket — darwin twin of linux.nix's
+  # systemd unit (launchd's own agent has an unpredictable socket path, and
+  # 1Password's agent can't store certificates). The socket file survives
+  # reboots under ~/.ssh, so clear it before binding.
+  launchd.agents.ssh-agent = lib.mkIf config.dotfiles.desktop.enable {
+    enable = true;
+    config = {
+      ProgramArguments = [
+        "/bin/sh"
+        "-c"
+        "rm -f ${config.dotfiles.ssh.certAgentSocket}; exec ${pkgs.openssh}/bin/ssh-agent -D -a ${config.dotfiles.ssh.certAgentSocket}"
+      ];
+      KeepAlive = true;
+      RunAtLoad = true;
+    };
+  };
 }

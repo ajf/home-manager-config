@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 # SSH host-CA trust: hosts presenting certs signed by a listed CA verify
 # without TOFU prompts or known_hosts churn (reinstalls included). Written to
@@ -25,6 +25,19 @@ in
     });
     default = [ ];
     description = "SSH host certificate authorities to trust via ~/.ssh/known_hosts2.";
+  };
+
+  # The local agent that holds step certificates (1Password's agent can't):
+  # the systemd user unit on Linux (linux.nix), a launchd agent on darwin
+  # (darwin.nix). step-ssh-login loads into it; identity ssh configs point
+  # cert-auth hosts at it via IdentityAgent.
+  options.dotfiles.ssh.certAgentSocket = lib.mkOption {
+    type = lib.types.str;
+    default =
+      if pkgs.stdenv.isDarwin
+      then "${config.home.homeDirectory}/.ssh/agent.sock"
+      else "/run/user/1000/ssh-agent.socket";
+    description = "Socket of the local cert-holding ssh-agent.";
   };
 
   config.home.file.".ssh/known_hosts2" = lib.mkIf (cas != [ ]) {

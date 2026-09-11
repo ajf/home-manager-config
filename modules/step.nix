@@ -49,22 +49,16 @@ in
       text = cfg.rootCert;
     };
 
-    # Desktop machines only: loads an SSH cert into the agent ssh actually
-    # authenticates with — the systemd agent unit on Linux, the launchd
-    # default agent on darwin. (1Password's agent can't hold certificates,
-    # and interactive shells may point SSH_AUTH_SOCK at it.)
+    # Desktop machines only: loads an SSH cert into the cert-holding agent
+    # ssh actually authenticates with — the systemd unit on Linux, the
+    # launchd agent on darwin, both bound to dotfiles.ssh.certAgentSocket.
+    # (1Password's agent can't hold certificates, and interactive shells
+    # point SSH_AUTH_SOCK at it.)
     programs.fish.functions.step-ssh-login =
-      lib.mkIf (cfg.caUrl != null && config.dotfiles.desktop.enable) (
-        (if pkgs.stdenv.isDarwin then ''
-          set -l sock (launchctl getenv SSH_AUTH_SOCK)
-          test -n "$sock"; or set sock $SSH_AUTH_SOCK
-        '' else ''
-          set -l sock $XDG_RUNTIME_DIR/ssh-agent.socket
-        '') + ''
-          SSH_AUTH_SOCK=$sock step ssh login ${config.home.username}${
-            lib.optionalString (cfg.sshProvisioner != null)
-              " --provisioner ${cfg.sshProvisioner}"} $argv
-        ''
-      );
+      lib.mkIf (cfg.caUrl != null && config.dotfiles.desktop.enable) ''
+        SSH_AUTH_SOCK=${config.dotfiles.ssh.certAgentSocket} step ssh login ${config.home.username}${
+          lib.optionalString (cfg.sshProvisioner != null)
+            " --provisioner ${cfg.sshProvisioner}"} $argv
+      '';
   };
 }
