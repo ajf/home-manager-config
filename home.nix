@@ -13,6 +13,7 @@
     ./modules/ghostty.nix
     ./modules/firefox.nix
     ./modules/obsidian.nix
+    ./modules/claude.nix
     ./modules/linux.nix
     ./modules/darwin.nix
   ];
