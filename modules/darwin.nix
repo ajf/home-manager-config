@@ -19,6 +19,15 @@ lib.mkIf pkgs.stdenv.isDarwin {
   xdg.configFile."fish/conf.d/homebrew.fish".source =
     ../config/fish/conf.d/homebrew.fish;
 
+  # Spotlight is lazy about indexing the copied .app bundles — nudge it
+  # after every generation so Cmd+Space finds nix-installed apps
+  # (Obsidian et al) without waiting for a re-login.
+  home.activation.spotlightIndexApps = lib.hm.dag.entryAfter [ "copyApps" ] ''
+    if [ -d "$HOME/Applications/Home Manager Apps" ]; then
+      run /usr/bin/mdimport "$HOME/Applications/Home Manager Apps" 2>/dev/null || true
+    fi
+  '';
+
   # Unlike the Linux desktop (ssh-auth-sock.fish prefers 1Password), the
   # shell default here is the launchd cert agent so bare `step ssh login`
   # and friends land creds in it; 1Password still serves regular keys via
