@@ -15,8 +15,11 @@ in
   config = lib.mkIf config.dotfiles.desktop.enable {
     home.packages = [ pkgs.obsidian ];
 
+    # The vault dir itself is created by Obsidian Sync when Andrew attaches
+    # the vault — we deliberately do NOT mkdir it (an empty pre-made dir just
+    # confuses first-sync). Registry is seeded only once the vault exists.
     home.activation.obsidianVault = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      run mkdir -p "${vault}"
+      if [ -d "${vault}" ]; then
       obsCfg="$HOME/${cfgDir}/obsidian.json"
       run mkdir -p "$(dirname "$obsCfg")"
       if [ ! -s "$obsCfg" ]; then
@@ -30,6 +33,7 @@ in
         ${pkgs.jq}/bin/jq --arg id "$vid" --arg p "${vault}" \
           '.vaults[$id] = {path: $p, open: true}' "$obsCfg" > "$tmp" \
           && run mv "$tmp" "$obsCfg"
+      fi
       fi
     '';
   };
