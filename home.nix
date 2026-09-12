@@ -12,6 +12,7 @@
     ./modules/neovim.nix
     ./modules/ghostty.nix
     ./modules/firefox.nix
+    ./modules/obsidian.nix
     ./modules/linux.nix
     ./modules/darwin.nix
   ];
