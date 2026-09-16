@@ -28,12 +28,14 @@ lib.mkIf pkgs.stdenv.isDarwin {
     fi
   '';
 
-  # Unlike the Linux desktop (ssh-auth-sock.fish prefers 1Password), the
-  # shell default here is the launchd cert agent so bare `step ssh login`
+  # The shell default here is the launchd cert agent so bare `step ssh login`
   # and friends land creds in it; 1Password still serves regular keys via
-  # IdentityAgent in the identity flake's ~/.ssh/config.
+  # IdentityAgent in the identity flake's ~/.ssh/config. An agent forwarded
+  # in over ssh wins, same as the Linux twin in config/fish/conf.d.
   xdg.configFile."fish/conf.d/ssh-auth-sock.fish".text = ''
-    set -gx SSH_AUTH_SOCK "${config.dotfiles.ssh.certAgentSocket}"
+    if not set -q SSH_CONNECTION; or not test -S "$SSH_AUTH_SOCK"
+      set -gx SSH_AUTH_SOCK "${config.dotfiles.ssh.certAgentSocket}"
+    end
   '';
 
   # Cert-holding ssh-agent on a stable socket — darwin twin of linux.nix's
