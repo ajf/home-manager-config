@@ -27,6 +27,16 @@
     - Link related memories with Obsidian-style [[wikilinks]]; they render
       as a real graph in Obsidian.
 
+    ## Homelab runbooks — consult before acting
+    - Before doing a recurring homelab task, READ the matching runbook memory
+      first (they exist precisely so you don't re-survey the estate): a new
+      containerized app -> `pioneer-app-runbook`; a DNS or DHCP change ->
+      `dns-dhcp-runbook`; a Grafana dashboard -> `grafana-runbook`; general
+      orientation -> `homelab-overview` (START HERE in the index). The MEMORY.md
+      index lists them; open the file, follow the recipe, skip the rediscovery.
+    - When you complete a class of task well and no runbook covers it, offer to
+      capture one — the recipe is cheapest to write while it's fresh in context.
+
     ## Bootstrapping a fresh machine
     1. First home-manager activation (hm-pull doesn't exist yet):
        `nix run home-manager/release-26.05 -- switch --flake 'git+ssh://git@github.com/ajf/home-manager-identity#andrew@<hostname>'`
