@@ -14,6 +14,19 @@ lib.mkIf (pkgs.stdenv.isLinux && config.dotfiles.desktop.enable) {
       PasswordManagerEnabled = false;
       OfferToSaveLogins = false;
 
+      # Same for cards and addresses: no "save this?" prompt, no autofill.
+      # Locked so the checkboxes in Settings -> Privacy can't drift back on.
+      Preferences = {
+        "extensions.formautofill.creditCards.enabled" = {
+          Value = false;
+          Status = "locked";
+        };
+        "extensions.formautofill.addresses.enabled" = {
+          Value = false;
+          Status = "locked";
+        };
+      };
+
       ExtensionSettings = {
         # uBlock Origin
         "uBlock0@raymondhill.net" = {
