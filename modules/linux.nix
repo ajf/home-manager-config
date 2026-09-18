@@ -83,6 +83,7 @@ lib.mkMerge [
       obsidian
       slack
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
+      dropbox # GUI client + tray; the daemon lives in the store, not ~/.dropbox-dist
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
 
       # Fonts referenced by ghostty/foot (darwin gets these via brew)
