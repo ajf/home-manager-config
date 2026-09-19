@@ -38,6 +38,12 @@ hl.config({
         kb_layout          = "us",
         numlock_by_default = true,
         kb_options         = "caps:ctrl_modifier",
+        -- input.natural_scroll covers mice; the touchpad has its own knob
+        -- and does not inherit it.
+        natural_scroll     = true,
+        touchpad = {
+            natural_scroll = true,
+        },
     },
 })
 
