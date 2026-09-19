@@ -154,5 +154,7 @@ hl.bind("SUPER + backslash", hl.dsp.exec_cmd("1password --quick-access"))
 -- has no outputs file until monitors are configured in DMS.
 pcall(require, "dms.outputs")
 require("dms.layout")
+-- colors was never wired up, so Hyprland borders ignored the DMS theme.
+require("dms.colors")
 require("dms.cursor")
 require("dms.binds")
