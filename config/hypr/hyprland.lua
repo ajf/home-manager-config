@@ -60,6 +60,19 @@ hl.device({
 })
 
 -- ==================
+-- GESTURES
+-- ==================
+-- Three-finger horizontal swipe changes workspace, as on macOS. This is
+-- Hyprland 0.49+'s gesture system, not the old gestures:workspace_swipe
+-- block. The swipe animates live and follows the finger, so it tracks the
+-- workspace under your hand rather than firing once at the end.
+hl.gesture({
+    fingers   = 3,
+    direction = "horizontal",
+    action    = "workspace",
+})
+
+-- ==================
 -- GENERAL LAYOUT
 -- ==================
 hl.config({
