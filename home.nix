@@ -15,6 +15,7 @@
     ./modules/obsidian.nix
     ./modules/claude.nix
     ./modules/wallpapers.nix
+    ./modules/obsidian-sync.nix
     ./modules/linux.nix
     ./modules/darwin.nix
   ];
