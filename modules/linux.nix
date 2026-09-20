@@ -122,8 +122,23 @@ lib.mkMerge [
     xdg.configFile."DankMaterialShell".source =
       config.lib.file.mkOutOfStoreSymlink "${config.dotfiles.path}/config/DankMaterialShell";
 
-    # Polkit auth agent (replaces the old mate-polkit exec-once)
-    services.hyprpolkitagent.enable = true;
+    # Polkit auth agent: DMS's, not hyprpolkitagent's.
+    #
+    # DMS ships one (Services/PolkitService.qml + Modals/PolkitAuthModal.qml)
+    # and was constructing it fine, but could never register -- polkit allows
+    # one agent per subject and hyprpolkitagent got there first ("An
+    # authentication agent already exists for the given subject").
+    #
+    # Worth the swap because hyprpolkitagent discards PAM's inputPrompt and
+    # shows a bare password box, so with pam_fprintd first in the stack there
+    # is no way to tell whether it wants a finger or a password -- and it is
+    # genuinely both, depending on whether something else currently holds the
+    # reader. DMS's modal renders inputPrompt, message and supplementaryMessage
+    # and shows a fingerprint icon, and matches the shell theme.
+    #
+    # Escape hatch if it misbehaves: DMS_DISABLE_POLKIT=1 in the environment
+    # makes DMS skip its agent, and re-enabling this gets the old dialog back.
+    services.hyprpolkitagent.enable = false;
 
     # hypridle as a user unit (auto-restart on crash) instead of a bare
     # exec from hyprland.lua; overrides the unit shipped in the package.
