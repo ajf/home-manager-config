@@ -160,6 +160,20 @@ hl.layer_rule({
 hl.bind("SUPER + grave",     hl.dsp.workspace.toggle_special("quake"))
 hl.bind("SUPER + backslash", hl.dsp.exec_cmd("1password --quick-access"))
 
+-- Tab switching on ALT+SHIFT+[ / ]. Firefox's own shortcuts are not
+-- user-configurable without an extension, so instead of rebinding Firefox we
+-- translate the combo into the Ctrl+PageUp/PageDown it already understands,
+-- via sendshortcut into the focused window.
+--
+-- Deliberately global rather than Firefox-only: Hyprland has no per-app binds,
+-- and Ctrl+PageUp/Down is "previous/next tab" in most tabbed apps anyway. In a
+-- terminal it may scroll instead -- harmless, but that is the trade.
+-- Prior = PageUp, Next = PageDown.
+hl.bind("ALT + SHIFT + bracketleft",
+    hl.dsp.send_shortcut({ mods = "CTRL", key = "Prior", window = "activewindow" }))
+hl.bind("ALT + SHIFT + bracketright",
+    hl.dsp.send_shortcut({ mods = "CTRL", key = "Next", window = "activewindow" }))
+
 -- ==================
 -- SOURCED CONFIGS
 -- ==================
