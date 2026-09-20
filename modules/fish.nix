@@ -1,6 +1,20 @@
 { config, lib, pkgs, ... }:
 
 {
+  # Which identity flake `hm-pull` applies releases from. This is site data,
+  # not dotfiles content -- a fork sets its own and never edits hm-pull.fish.
+  options.dotfiles.identityFlake = lib.mkOption {
+    type = lib.types.nullOr lib.types.str;
+    default = null;
+    example = "git+ssh://git@github.com/you/home-manager-identity";
+    description = ''
+      Flake reference holding this fleet's homeConfigurations, keyed
+      "<username>@<hostname>". null omits the hm-pull function entirely,
+      which is the right answer until a fork has an identity repo.
+    '';
+  };
+
+  config = {
   programs.fish = {
     enable = true;
 
@@ -51,6 +65,17 @@
     ../config/fish/functions/fish_ssh_agent.fish;
   xdg.configFile."fish/functions/hm.fish".source =
     ../config/fish/functions/hm.fish;
-  xdg.configFile."fish/functions/hm-pull.fish".source =
-    ../config/fish/functions/hm-pull.fish;
+
+  # hm-pull.fish is a template: the identity flake ref and username are
+  # substituted in here rather than baked into the checked-in file, so this
+  # repo carries no one's repo name or username. Without an identityFlake
+  # there is nothing to pull from, so the function is simply not installed.
+  xdg.configFile."fish/functions/hm-pull.fish" =
+    lib.mkIf (config.dotfiles.identityFlake != null) {
+      text = builtins.replaceStrings
+        [ "@identityFlake@" "@username@" ]
+        [ config.dotfiles.identityFlake config.home.username ]
+        (builtins.readFile ../config/fish/functions/hm-pull.fish);
+    };
+  };
 }

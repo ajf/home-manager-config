@@ -1,64 +1,40 @@
+{ config, lib, ... }:
+
 # Global Claude Code conventions, shipped to every machine. Read-only by
 # design: changing the rules is a dotfiles commit, not a session side effect.
-{ ... }:
+#
+# The mechanism is generic; the conventions themselves are not. Which tracker
+# holds the todo list, which vault holds memory, which host is canonical, what
+# the runbooks are called -- that is all site-specific data, supplied by the
+# per-machine identity flake through this option, in the same spirit as
+# modules/step.nix. Keeping it out of here means this repo stays forkable and
+# does not publish someone's infrastructure.
+let
+  cfg = config.dotfiles.claude;
+in
 {
-  home.file.".claude/CLAUDE.md".text = ''
-    # Global conventions
+  options.dotfiles.claude.conventions = lib.mkOption {
+    type = lib.types.nullOr lib.types.lines;
+    default = null;
+    example = ''
+      # Global conventions
 
-    ## Task tracking → Todoist
-    - The canonical todo list is Todoist, project "Homelab" (sections:
-      Quick wins / Projects / Ziply pre-activation / Hardware / Waiting on
-      Andrew / Someday; label `homelab`).
-    - Add, update, and complete action items THERE — never track open tasks
-      in memory files or plan documents. Memory holds knowledge; plan docs
-      hold design detail; Todoist holds what to do next.
-    - Use the Todoist MCP tools when connected; otherwise the unified v1
-      API (https://api.todoist.com/api/v1 — REST v2 is dead, returns 410).
-      The API token is Andrew's: ask for it (1Password), don't store it.
+      ## Task tracking
+      - The canonical todo list is <tracker>; add and complete items there
+        rather than tracking them in memory files or plan documents.
 
-    ## Memory / knowledge → Obsidian
-    - Write memories through the normal Claude memory directories. On
-      intrepid (the canonical session host for memory) they are symlinked
-      into the Obsidian vault: ~/notes/personal/claude-memory/
-      (home/ = user & environment, projects/ = project knowledge), and
-      Obsidian Sync carries them to every device.
-    - Do not break those symlinks; other machines hold stale or empty
-      copies — treat intrepid's memory as the source of truth.
-    - Link related memories with Obsidian-style [[wikilinks]]; they render
-      as a real graph in Obsidian.
+      ## Memory / knowledge
+      - Write memories through the normal Claude memory directories; on
+        <canonical-host> they are symlinked into the notes vault.
+    '';
+    description = ''
+      Markdown written to ~/.claude/CLAUDE.md, which Claude Code loads as
+      standing instructions for every session on this machine. null (the
+      default) writes no file, which is the right answer for a fresh fork.
+    '';
+  };
 
-    ## Homelab runbooks — consult before acting
-    - Before doing a recurring homelab task, READ the matching runbook memory
-      first (they exist precisely so you don't re-survey the estate): a new
-      containerized app -> `pioneer-app-runbook`; a DNS or DHCP change ->
-      `dns-dhcp-runbook`; a Grafana dashboard -> `grafana-runbook`; general
-      orientation -> `homelab-overview` (START HERE in the index). The MEMORY.md
-      index lists them; open the file, follow the recipe, skip the rediscovery.
-    - When you complete a class of task well and no runbook covers it, offer to
-      capture one — the recipe is cheapest to write while it's fresh in context.
-
-    ## Bootstrapping a fresh machine
-    1. First home-manager activation (hm-pull doesn't exist yet):
-       `nix run home-manager/release-26.05 -- switch --flake 'git+ssh://git@github.com/ajf/home-manager-identity#andrew@<hostname>'`
-       Afterwards `hm-pull` applies releases; `hm` iterates on a local
-       dotfiles checkout.
-    2. Obsidian (UI-only, ~60s, needs Andrew): open Obsidian -> sign in ->
-       Settings -> Sync -> Connect to existing remote vault `personal` at
-       ~/notes/personal -> E2E passphrase. Sync creates the directory;
-       nothing pre-creates it. Spotlight/launcher and vault registry are
-       handled by home-manager.
-    3. Memory wiring — ONLY when this machine becomes the canonical
-       session host (one writer at a time; Sync is not append-safe for
-       concurrent writers). After the vault has synced:
-         ~/.claude/projects/-home-andrew/memory
-           -> symlink to ~/notes/personal/claude-memory/home
-         ~/.claude/projects/-home-andrew-projects/memory
-           -> symlink to ~/notes/personal/claude-memory/projects
-       (move any existing files into the vault first, then replace the
-       dirs with symlinks). Update the `todoist-obsidian` memory to name
-       the new canonical host. On non-canonical machines leave memory
-       dirs alone — they may be stale; the vault copy is the truth.
-    4. Session start: recall begins at the `homelab-overview` memory
-       ("START HERE" in the index).
-  '';
+  config = lib.mkIf (cfg.conventions != null) {
+    home.file.".claude/CLAUDE.md".text = cfg.conventions;
+  };
 }

@@ -15,7 +15,7 @@ in
   config = lib.mkIf config.dotfiles.desktop.enable {
     home.packages = [ pkgs.obsidian ];
 
-    # The vault dir itself is created by Obsidian Sync when Andrew attaches
+    # The vault dir itself is created by Obsidian Sync when the user attaches
     # the vault — we deliberately do NOT mkdir it (an empty pre-made dir just
     # confuses first-sync). Registry is seeded only once the vault exists.
     home.activation.obsidianVault = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
