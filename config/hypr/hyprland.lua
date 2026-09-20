@@ -43,6 +43,13 @@ hl.config({
         natural_scroll     = true,
         touchpad = {
             natural_scroll = true,
+            -- macOS-style clicking: one finger anywhere = left, two = right
+            -- (three = middle, which macOS lacks). The alternative,
+            -- button-areas, splits the bottom strip into fixed left/right
+            -- zones whose boundary libinput does not let you move.
+            -- Also makes physical clicks agree with taps, since tap_to_click
+            -- already right-clicks on a two-finger tap.
+            clickfinger_behavior = true,
         },
     },
 })
