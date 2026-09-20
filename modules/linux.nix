@@ -82,6 +82,7 @@ lib.mkMerge [
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
+      signal-desktop
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
       dropbox # GUI client + tray; the daemon lives in the store, not ~/.dropbox-dist
       # RSS client that speaks Miniflux natively, so read state stays on the
