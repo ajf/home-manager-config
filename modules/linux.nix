@@ -75,7 +75,6 @@ lib.mkMerge [
     home.packages = with pkgs; [
       foot
       hypridle
-      hyprpaper
       hyprsunset
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager

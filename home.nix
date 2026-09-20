@@ -14,6 +14,7 @@
     ./modules/firefox.nix
     ./modules/obsidian.nix
     ./modules/claude.nix
+    ./modules/wallpapers.nix
     ./modules/linux.nix
     ./modules/darwin.nix
   ];
