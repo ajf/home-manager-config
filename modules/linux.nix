@@ -81,6 +81,7 @@ lib.mkMerge [
       kdePackages.okular # PDF reader
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
+      (pkgs.callPackage ../pkgs/notesmd-cli.nix { }) # community Obsidian CLI; not in nixpkgs
       slack
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
