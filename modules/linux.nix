@@ -84,6 +84,11 @@ lib.mkMerge [
       slack
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
       dropbox # GUI client + tray; the daemon lives in the store, not ~/.dropbox-dist
+      # RSS client that speaks Miniflux natively, so read state stays on the
+      # server (rss.forgue.io). Evolution's built-in RSS backend only takes
+      # plain feed URLs -- it cannot talk to an aggregator, which would mean
+      # two readers with separate read state.
+      newsflash
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
 
       # Fonts referenced by ghostty/foot (darwin gets these via brew)
