@@ -79,6 +79,13 @@ lib.mkMerge [
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
       kdePackages.okular # PDF reader
+      # Image viewer, the macOS Preview role. Okular can display images via
+      # kimgio and was the registered handler, but it is a document viewer --
+      # slow to start and awkward for a PNG. MIME defaults are NOT declared
+      # here: ~/.config/mimeapps.list is written at runtime by Dolphin et al
+      # when you pick "Open With -> always", so home-manager owning it would
+      # break that. Set with `xdg-mime default`; machine-local state.
+      loupe
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
