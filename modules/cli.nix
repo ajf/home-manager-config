@@ -23,6 +23,7 @@
     mermaid-cli
     podman
     ipmitool
+    htop
 
     # neomutt/senpai configs are per-machine (identity repo); packages only here
     neomutt
