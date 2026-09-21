@@ -72,6 +72,29 @@ hl.gesture({
     action    = "workspace",
 })
 
+-- Swipe sensitivity. distance is the finger travel (px) for a full workspace
+-- change, so lower is more sensitive -- 300 is the default and felt like a lot
+-- of trackpad. cancel_ratio is how far through you must get for it to commit
+-- rather than snap back; 0.5 default, lowered to match.
+hl.config({
+    gestures = {
+        workspace_swipe_distance     = 180,
+        workspace_swipe_cancel_ratio = 0.35,
+    },
+})
+
+-- Three-finger swipe down toggles DMS's workspace overview -- the same thing
+-- SUPER+TAB does (dms/binds.lua), so this is a gesture onto an existing
+-- action rather than a second implementation. Hyprland has no built-in
+-- overview; the overview belongs to DMS, hence the IPC call.
+hl.gesture({
+    fingers   = 3,
+    direction = "down",
+    action    = function()
+        hl.exec_cmd("dms ipc call hypr toggleOverview")
+    end,
+})
+
 -- ==================
 -- GENERAL LAYOUT
 -- ==================
