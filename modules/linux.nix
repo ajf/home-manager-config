@@ -79,6 +79,21 @@ lib.mkMerge [
       dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
       kdePackages.okular # PDF reader
+      # Image viewer -- the macOS Preview role. Images previously opened in
+      # Okular via kimgio: works, but it is a document viewer, slow to start
+      # and awkward for a PNG.
+      kdePackages.gwenview
+      # kbuildsycoca6, which rebuilds KDE's service database so KDE apps notice
+      # newly installed .desktop files and MIME associations. A Plasma session
+      # pulls this in; running Dolphin/Okular standalone under Hyprland does
+      # not, so there was previously no way to refresh the cache at all.
+      #
+      # The other half of that fix is system-side:
+      # environment.etc."xdg/menus/applications.menu" in nixos-desktop's
+      # desktop-common.nix. Without an application menu KDE cannot build the
+      # service tree, and Dolphin offers an "open with" chooser no matter how
+      # correct mimeapps.list is -- see that comment for the full story.
+      kdePackages.kservice
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
