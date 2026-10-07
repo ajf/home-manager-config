@@ -88,6 +88,11 @@ lib.mkMerge [
       hypridle
       hyprsunset
       dmsPkg # DankMaterialShell (`dms` CLI + quickshell config)
+      # Second browser next to Firefox (modules/firefox.nix stays the default),
+      # for the sites that only behave in Blink. NIXOS_OZONE_WL is already set
+      # session-wide, so nixpkgs' wrapper hands it --ozone-platform-hint=auto
+      # and it runs natively on Wayland rather than XWayland.
+      google-chrome
       kdePackages.dolphin # GUI file manager
       kdePackages.okular # PDF reader
       # Image viewer -- the macOS Preview role. Images previously opened in
