@@ -164,6 +164,11 @@ lib.mkMerge [
       # plain feed URLs -- it cannot talk to an aggregator, which would mean
       # two readers with separate read state.
       newsflash
+      # Tailscale tray icon (Qt). Autostarted from hyprland.lua; the CLI and
+      # tailscaled itself are system-side, this is only the tray client.
+      # tailscale-systray was the other candidate -- this one is maintained and
+      # its menu can toggle the tunnel, exit nodes and routes.
+      tail-tray
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
 
       # Fonts referenced by ghostty/foot (darwin gets these via brew)

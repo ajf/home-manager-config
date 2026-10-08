@@ -8,6 +8,26 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
     hl.exec_cmd("systemctl --user start hyprland-session.target")
     hl.exec_cmd("1password --silent")
+    -- Tray-only autostarts. Each was verified to register a StatusNotifierItem
+    -- without mapping a window, so none of them flashes a window on login:
+    -- Signal needs the flag, the other two do it by default.
+    --
+    -- Cider is deliberately NOT here. It cannot start hidden: there is no
+    -- --hidden/--start-in-tray flag in its asar, spa-config.yml has only
+    -- closeToTray (no start-minimized key), and window_state.json persists
+    -- size and position but no hidden state. The only way to land it in the
+    -- tray is to let the window map and then close it, which means several
+    -- seconds of visible window on every login -- not worth it for a music
+    -- player. closeToTray keeps it resident once opened by hand.
+    hl.exec_cmd("signal-desktop --start-in-tray")
+    -- Tailscale tray. tailscaled's OperatorUser is andrew, so its menu can
+    -- bring the tunnel up and down without asking for root.
+    hl.exec_cmd("tail-tray")
+    -- iPhone bridge. tether-gtk is the tray client and spawns tetherd itself
+    -- when none is running, so there is no separate daemon to start -- see the
+    -- comments in the package's own tetherd.service. The binary comes from the
+    -- system closure (NixOS), not from this repo.
+    hl.exec_cmd("tether-gtk")
     -- hypridle runs as a systemd user unit (see modules/linux.nix)
     -- polkit agent handled by home-manager (services.hyprpolkitagent)
     hl.exec_cmd("hyprsunset -t 4500")
