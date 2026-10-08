@@ -31,6 +31,28 @@ end)
 hl.env("QT_QPA_PLATFORMTHEME", "xdgdesktopportal")
 
 -- ==================
+-- XWAYLAND
+-- ==================
+-- On a fractionally scaled output (eDP-1 runs at 1.25) Hyprland renders X11
+-- clients at scale 1 and then upscales the finished surface, resampling
+-- glyphs that were already rasterized -- text comes out grainy with uneven
+-- kerning. force_zero_scaling hands XWayland the native pixel grid instead,
+-- so those clients rasterize at full density and nothing is stretched.
+--
+-- The tradeoff is that X11 clients no longer learn the output scale and lay
+-- out too small; each one needs its toolkit told by hand. VLC is the only
+-- XWayland client here and carries QT_SCALE_FACTOR in its wrapper -- see
+-- vlc' in the dotfiles' modules/linux.nix. Anything X11 added later will
+-- need the same treatment.
+--
+-- This is a no-op on outputs at scale 1, where there is no upscale to avoid.
+hl.config({
+    xwayland = {
+        force_zero_scaling = true,
+    },
+})
+
+-- ==================
 -- INPUT CONFIG
 -- ==================
 hl.config({

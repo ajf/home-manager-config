@@ -40,6 +40,37 @@ let
   # new dms while the running service was still the old one.
   dmsPkg = pkgsUnstable.dms-shell;
 
+  # VLC 3 is Qt 5.15, and its Qt interface hard-requires X11 for video
+  # embedding -- it stays on XWayland even when handed QT_QPA_PLATFORM=wayland
+  # with qtwayland-5 already on its plugin path (nixpkgs wraps that in), which
+  # is verifiable via `hyprctl clients`: every other app reports
+  # xwayland=false, VLC reports true. VLC 4 is the actual fix.
+  #
+  # xwayland:force_zero_scaling in hyprland.lua stops Hyprland upscaling X11
+  # surfaces, which is what made VLC's text grainy -- but it then lays out too
+  # small, because Qt5 predates wp_fractional_scale_v1 and so never learns the
+  # output's 1.25 scale. QT_SCALE_FACTOR supplies it by hand.
+  #
+  # 1.5 is tuned by eye against the Qt6 apps on a 1.25-scaled HiDPI output;
+  # past ~2.0 the menu bar collapses into an overflow chevron. A machine
+  # running its displays at scale 1 wants this dropped to 1.0.
+  vlc' = pkgs.symlinkJoin {
+    name = "vlc-hidpi";
+    paths = [ pkgs.vlc ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/vlc --set QT_SCALE_FACTOR 1.5
+
+      # vlc.desktop hardcodes absolute store paths in Exec and TryExec, so
+      # opening a video from Dolphin would run the unwrapped binary and skip
+      # the scale factor. Repoint both at the wrapper.
+      rm $out/share/applications/vlc.desktop
+      substitute ${pkgs.vlc}/share/applications/vlc.desktop \
+        $out/share/applications/vlc.desktop \
+        --replace-fail ${pkgs.vlc}/bin/vlc $out/bin/vlc
+    '';
+  };
+
   # Tools DMS shells out to (quickshell as `qs`, plus theming/screenshot/etc.)
   #
   # quickshell tracks unstable alongside dms-shell, and the two must move
@@ -99,6 +130,7 @@ lib.mkMerge [
       # Okular via kimgio: works, but it is a document viewer, slow to start
       # and awkward for a PNG.
       kdePackages.gwenview
+      vlc' # Video player; wrapped for HiDPI (see above)
       # kbuildsycoca6, which rebuilds KDE's service database so KDE apps notice
       # newly installed .desktop files and MIME associations. A Plasma session
       # pulls this in; running Dolphin/Okular standalone under Hyprland does
