@@ -142,6 +142,17 @@ lib.mkMerge [
       # service tree, and Dolphin offers an "open with" chooser no matter how
       # correct mimeapps.list is -- see that comment for the full story.
       kdePackages.kservice
+      # kiod6 -- KIO's out-of-process daemon, which hosts the kpasswdserver
+      # module that every KIO credential prompt goes through. Dolphin's wrapper
+      # already puts kio and kio-extras on its QT_PLUGIN_PATH, so browsing to an
+      # SMB share works right up to the point it needs a username/password, then
+      # fails with "communication with the local password server failed":
+      # kiod6 is D-Bus activated, and its four service files
+      # (org.kde.{kiod6,kioexecd6,kpasswdserver6,kssld6}) only reach the session
+      # bus if kio is a *profile* package -- as a mere closure dependency of
+      # dolphin its share/dbus-1/services is on no XDG_DATA_DIRS entry. A Plasma
+      # session installs these; Hyprland does not. Same shape as kservice above.
+      kdePackages.kio
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
