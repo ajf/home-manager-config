@@ -59,6 +59,25 @@ hl.device({
     natural_scroll = true,
 })
 
+-- Moonlander (QMK): the firmware owns its own caps mapping, so the global
+-- caps:ctrl_modifier must not be layered on top of it. Empty kb_options
+-- overrides the global value for this device only.
+--
+-- Two blocks because the board exposes two typing endpoints: the 6KRO boot
+-- keyboard (interface 1.0) and the NKRO one (interface 1.2). Both report
+-- `keyboard` to libinput and both would otherwise inherit the global options.
+-- Its System Control and Consumer Control nodes send power and media keys
+-- rather than characters, so they need nothing.
+hl.device({
+    name       = "zsa-technology-labs-moonlander-mark-i",
+    kb_options = "",
+})
+
+hl.device({
+    name       = "zsa-technology-labs-moonlander-mark-i-keyboard",
+    kb_options = "",
+})
+
 -- ==================
 -- GESTURES
 -- ==================
