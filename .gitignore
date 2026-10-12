@@ -16,4 +16,27 @@ config/hypr/.dms-backups/
 config/DankMaterialShell/settings.json
 config/DankMaterialShell/session.json
 config/DankMaterialShell/*.log
+
+# DMS 1.6.3 writes hyprland.lua.backup<epoch> beside the file it is about to
+# touch rather than into the .dms-backups/ directory above, so these pile up in
+# the worktree -- one per reload.
+config/hypr/hyprland.lua.backup*
+
+# Also derived from the machine-local theme selection, same reason as colors.lua
+# above: ghostty's palette is regenerated on every theme change. Nothing reads
+# firefox.css at all -- the Firefox profile has no chrome/userChrome.css and
+# toolkit.legacyUserProfileCustomizations.stylesheets is unset.
+config/ghostty/themes/dankcolors
+config/DankMaterialShell/firefox.css
+
+# Theme previews are rendered by DMS, and tokyoNight is its registry copy of the
+# upstream theme (author "Avenge Media"), re-fetched on demand. The adapted
+# tokyoNightNightMoon/theme.json stays tracked: that one is hand-written, and is
+# what settings.json actually selects.
+config/DankMaterialShell/themes/*/preview-*.svg
+config/DankMaterialShell/themes/tokyoNight/
+
+# One marker per version whose changelog DMS has shown.
+config/DankMaterialShell/.changelog-*
+
 result
