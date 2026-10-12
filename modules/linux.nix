@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 let
   desktop = config.dotfiles.desktop.enable;
@@ -32,9 +32,20 @@ let
     '';
   };
 
+  # DMS tracks unstable: 26.05 is two minors behind (1.4.6 vs 1.6.3).
+  #
+  # Named once and used for BOTH home.packages and the systemd unit's
+  # ExecStart. They were previously written out separately, so changing the
+  # package left the unit launching the old store path — the profile had the
+  # new dms while the running service was still the old one.
+  dmsPkg = pkgsUnstable.dms-shell;
+
   # Tools DMS shells out to (quickshell as `qs`, plus theming/screenshot/etc.)
-  dmsDeps = with pkgs; [
-    quickshell
+  #
+  # quickshell tracks unstable alongside dms-shell, and the two must move
+  # together: DMS *is* a quickshell config, and upstream builds 1.6.3 against
+  # 0.3.1 rather than the 0.3.0 in 26.05.
+  dmsDeps = [ pkgsUnstable.quickshell ] ++ (with pkgs; [
     matugen
     dgop
     grim
@@ -42,7 +53,7 @@ let
     brightnessctl
     cliphist
     wl-clipboard
-  ];
+  ]);
 in
 lib.mkMerge [
 
@@ -76,7 +87,7 @@ lib.mkMerge [
       foot
       hypridle
       hyprsunset
-      dms-shell # DankMaterialShell (`dms` CLI + quickshell config)
+      dmsPkg # DankMaterialShell (`dms` CLI + quickshell config)
       kdePackages.dolphin # GUI file manager
       kdePackages.okular # PDF reader
       # Image viewer -- the macOS Preview role. Images previously opened in
@@ -193,7 +204,7 @@ lib.mkMerge [
         # System dirs cover both NixOS (/run/current-system) and generic
         # Linux (/usr/bin); missing entries are harmless.
         Environment = "PATH=${lib.makeBinPath dmsDeps}:/run/current-system/sw/bin:%h/.nix-profile/bin:/usr/bin:/bin";
-        ExecStart = "${pkgs.dms-shell}/bin/dms run --session";
+        ExecStart = "${dmsPkg}/bin/dms run --session";
         ExecReload = "${pkgs.procps}/bin/pkill -USR1 -x dms";
         Restart = "on-failure";
         RestartSec = "1";

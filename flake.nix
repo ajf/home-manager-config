@@ -5,13 +5,16 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     # Darwin gets its own branch: same release, better binary-cache coverage.
     nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
+    # A few fast-moving desktop packages are taken from here rather than the
+    # release — see modules/linux.nix. Everything else stays on 26.05.
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, nixpkgs-darwin, home-manager, ... }:
+  outputs = { nixpkgs, nixpkgs-darwin, nixpkgs-unstable, home-manager, ... }:
     let
       lib = nixpkgs.lib;
 
@@ -55,6 +58,12 @@
         in
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
+          extraSpecialArgs = {
+            pkgsUnstable = import nixpkgs-unstable {
+              system = sys;
+              config.allowUnfree = true;
+            };
+          };
           modules = [
             ./home.nix
             {

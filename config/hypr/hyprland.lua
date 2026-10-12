@@ -232,11 +232,16 @@ hl.bind("ALT + SHIFT + bracketright",
 -- ==================
 -- SOURCED CONFIGS
 -- ==================
--- outputs is machine-local (written by DMS, gitignored); a fresh machine
--- has no outputs file until monitors are configured in DMS.
+-- Everything DMS generates is gitignored, so a fresh checkout has none of it
+-- until DMS has run once — hence pcall rather than require. A hard require
+-- here would abort the whole config and leave a new machine with no desktop
+-- at all. DMS writes these as native Lua since 1.6.3 and reloads Hyprland
+-- itself, so they appear moments into the first session.
 pcall(require, "dms.outputs")
-require("dms.layout")
--- colors was never wired up, so Hyprland borders ignored the DMS theme.
-require("dms.colors")
-require("dms.cursor")
+pcall(require, "dms.layout")
+pcall(require, "dms.colors")
+pcall(require, "dms.cursor")
+
+-- Hand-written, always present: keep this one a hard require so a genuine
+-- mistake in it is loud rather than silently dropping every keybind.
 require("dms.binds")
