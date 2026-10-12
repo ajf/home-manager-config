@@ -283,6 +283,7 @@ pcall(require, "dms.outputs")
 pcall(require, "dms.layout")
 pcall(require, "dms.colors")
 pcall(require, "dms.cursor")
+pcall(require, "dms.windowrules")
 
 -- Hand-written, always present: keep this one a hard require so a genuine
 -- mistake in it is loud rather than silently dropping every keybind.
