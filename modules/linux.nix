@@ -76,9 +76,10 @@ let
   # quickshell tracks unstable alongside dms-shell, and the two must move
   # together: DMS *is* a quickshell config, and upstream builds 1.6.3 against
   # 0.3.1 rather than the 0.3.0 in 26.05.
-  dmsDeps = [ pkgsUnstable.quickshell ] ++ (with pkgs; [
+  # dux-gop (renamed from dgop; the binary is still `dgop`) moves with DMS
+  # too: 26.05 carries 0.2.2 against DMS 1.6.3's 2.x.
+  dmsDeps = [ pkgsUnstable.quickshell pkgsUnstable.dux-gop ] ++ (with pkgs; [
     matugen
-    dgop
     grim
     slurp
     brightnessctl
