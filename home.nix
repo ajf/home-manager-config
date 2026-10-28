@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 {
   imports = [
@@ -81,6 +81,9 @@
 
     programs.claude-code = {
       enable = true;
+      # 26.05 is stuck on 2.1.223; take the current release from unstable,
+      # same as dms-shell in modules/linux.nix.
+      package = pkgsUnstable.claude-code;
       settings = { };
       mcpServers = { };
     };
