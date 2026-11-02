@@ -39,7 +39,7 @@ in
     plugins = [
       {
         plugin = pkgs.tmuxPlugins.tokyo-night-tmux;
-        extraConfig = "set -g @tokyo-night-tmux_theme night";
+        extraConfig = "set -g @tokyo-night-tmux_theme storm";
       }
       tmux-cargo
       {

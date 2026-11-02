@@ -15,7 +15,7 @@ require("tokyonight").setup({
 local git_blame = require('gitblame')
 require('lualine').setup({
     options = {
-        theme = "nord"
+        theme = "tokyonight"
     },
     sections = {
         lualine_a = { { 'filename', file_status = true, path = 1, shorting_target = 20 } },
