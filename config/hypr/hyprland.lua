@@ -22,7 +22,11 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("signal-desktop --start-in-tray")
     -- Tailscale tray. tailscaled's OperatorUser is andrew, so its menu can
     -- bring the tunnel up and down without asking for root.
-    hl.exec_cmd("tail-tray")
+    -- Only where installed: dotfiles.tailscaleTray = false drops the package.
+    local has_tray = os.execute("command -v tail-tray >/dev/null 2>&1")
+    if has_tray == true or has_tray == 0 then
+        hl.exec_cmd("tail-tray")
+    end
     -- iPhone bridge. tether-gtk is the tray client and spawns tetherd itself
     -- when none is running, so there is no separate daemon to start -- see the
     -- comments in the package's own tetherd.service. The binary comes from the

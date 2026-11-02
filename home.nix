@@ -41,6 +41,16 @@
       '';
     };
 
+    tailscaleTray = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Install the Tailscale tray client (tail-tray) and autostart it with
+        the session. Disable on machines that run no tailscaled — the tray
+        has nothing to talk to there.
+      '';
+    };
+
     identity = {
       name = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
