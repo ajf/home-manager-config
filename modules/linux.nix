@@ -166,6 +166,11 @@ lib.mkMerge [
       # two readers with separate read state.
       newsflash
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
+      # ZSA Moonlander: Keymapp (GUI, unfree) to manage and live-train the
+      # layout, wally-cli to flash firmware. Both need the udev rules from
+      # hardware.keyboard.zsa in nixos-desktop's desktop-common.nix.
+      keymapp
+      wally-cli
 
       # Fonts referenced by ghostty/foot (darwin gets these via brew)
       nerd-fonts.caskaydia-cove
