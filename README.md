@@ -74,3 +74,36 @@ Defaults an identity flake picks from:
   Homebrew is retired.
 - Neovim and tmux plugins are managed by `home-manager`, not their native
   package managers.
+
+## 🖥️ Per-machine DMS settings
+
+DankMaterialShell keeps its choices in machine-local state that does not travel
+with this repo (`config/DankMaterialShell/settings.json`, gitignored, and
+`~/.local/state/DankMaterialShell/session.json`). A fresh DMS-desktop therefore
+starts with DMS's defaults: Material You purple, no wallpaper, and **never
+locking**. Set these once per machine with DMS's own IPC while `dms` is running
+(or in its Settings UI):
+
+```sh
+# lock after 5 minutes idle (seconds), on AC and on battery
+dms ipc call settings set acLockTimeout 300
+dms ipc call settings set batteryLockTimeout 300
+
+# laptops: panel off after 10 minutes idle on battery (needs UPower, so the
+# system config must enable services.upower). AC blanking stays unset.
+dms ipc call settings set batteryMonitorTimeout 600
+
+# theme: the repo ships tokyoNightStorm (and Night/Moon) under
+# config/DankMaterialShell/themes; selecting one is machine state
+dms ipc call settings set currentThemeName custom
+dms ipc call settings set customThemeFile \
+  ~/.config/home-manager/config/DankMaterialShell/themes/tokyoNightStorm/theme.json
+
+# wallpaper: images deployed by the identity flake land in
+# ~/.local/share/backgrounds; choosing one is machine state
+dms ipc call wallpaper set ~/.local/share/backgrounds/<file>
+```
+
+DMS drops any key set back to its default value, so `settings get` is the way
+to check a value; a missing key in `settings.json` means "default", not "never
+touched". hypridle has no listeners; all idle policy lives in DMS.
