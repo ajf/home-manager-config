@@ -38,6 +38,15 @@ lib.mkIf pkgs.stdenv.isDarwin {
     end
   '';
 
+  # `op` decides whether desktop-app integration is on by READING the app's
+  # settings.json inside ~/Library/Group Containers/2BUA8C4S2C.com.1password,
+  # which macOS gates behind Full Disk Access for the responsible app (the
+  # terminal). Without it op reports "No accounts configured" even with the
+  # integration checkbox ticked -- it never asks the app. Setting this skips
+  # that file check and goes straight to the native-messaging channel, which
+  # is NOT gated, so op works without granting the terminal FDA.
+  home.sessionVariables.OP_BIOMETRIC_UNLOCK_ENABLED = "true";
+
   # Cert-holding ssh-agent on a stable socket — darwin twin of linux.nix's
   # systemd unit (launchd's own agent has an unpredictable socket path, and
   # 1Password's agent can't store certificates). The socket file survives
