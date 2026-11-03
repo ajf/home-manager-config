@@ -194,6 +194,17 @@ hl.config({
 })
 
 -- ==================
+-- WORKSPACES
+-- ==================
+-- Eight fixed workspaces that exist from login whether or not they hold a
+-- window, so the relative binds in dms/binds.lua ("e+1" / "e-1") walk 1..8 and
+-- never invent a ninth. Without `persistent`, an empty workspace vanishes and
+-- the stepping binds have nowhere to go.
+for i = 1, 8 do
+    hl.workspace_rule({ workspace = tostring(i), persistent = true })
+end
+
+-- ==================
 -- DECORATION
 -- ==================
 hl.config({
