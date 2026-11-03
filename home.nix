@@ -118,5 +118,17 @@
       settings = { };
       mcpServers = { };
     };
+
+    # OpenAI's terminal agent, the counterpart to claude-code above. From
+    # unstable for the same reason (26.05 has 0.146; unstable moves weekly), and
+    # so the desktop app in modules/linux.nix, which nixpkgs wires to the codex
+    # it is built against, runs the same CLI. `settings` is left empty on
+    # purpose: home-manager then writes no config.toml, and Codex keeps its own
+    # (it records trusted projects and model choices there at runtime, which a
+    # read-only store symlink would break).
+    programs.codex = {
+      enable = true;
+      package = pkgsUnstable.codex;
+    };
   };
 }

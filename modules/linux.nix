@@ -164,6 +164,11 @@ lib.mkMerge [
       # two readers with separate read state.
       newsflash
       libfido2 # fido2-{token,cred,assert}: teams-for-linux shells out to these for WebAuthn
+      # OpenAI's ChatGPT desktop app, which carries the Codex app. Linux is a
+      # public preview, shipped upstream only as .deb/.rpm; nixpkgs repackages
+      # the official .deb (unfree, binary). From unstable, with the `codex` CLI
+      # in home.nix, so the app and the terminal agent are the same version.
+      pkgsUnstable.chatgpt
       # ZSA Moonlander: Keymapp (GUI, unfree) to manage and live-train the
       # layout, wally-cli to flash firmware. Both need the udev rules from
       # hardware.keyboard.zsa in nixos-desktop's desktop-common.nix.
