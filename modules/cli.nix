@@ -14,6 +14,7 @@
     # gh as a plain package, NOT programs.gh: the HM module makes config.yml
     # a read-only store link, which breaks `gh auth login`'s config writes.
     gh
+    _1password-cli # `op`; the tmux 1password plugin and SSH/signing flows use it
     zoxide
     yazi # TUI file manager
     rustup
