@@ -81,4 +81,10 @@ if #workspaces > 0 then
     map("od", "today", "today's daily note")
     map("ob", "backlinks", "backlinks to this note")
     map("ow", "workspace", "switch vault")
+
+    -- File tree rooted at the work vault, wherever nvim was started from.
+    -- (The plain "\" binding in ui.lua shows the current directory instead.)
+    vim.keymap.set("n", "<Leader>o\\", function()
+        vim.cmd("Neotree dir=" .. vim.fn.fnameescape(vim.fn.expand("~/notes/work")))
+    end, { desc = "Obsidian: file tree of the work vault" })
 end
