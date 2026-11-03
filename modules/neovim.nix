@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 {
   # nvim-based pager that isn't annoying: renders ANSI colors, passes short
@@ -14,13 +14,25 @@
     enable = true;
     defaultEditor = true; # sets $EDITOR = nvim
 
+    # Editor and plugins both come from unstable. The 26.05 release branch holds
+    # them where they were at the branch cut (nvim 0.12.4, treesitter April,
+    # rustaceanvim 9.0, obsidian.nvim 3.16.3) and never moves them; unstable is
+    # what is actually maintained. They must move together, not one by one:
+    # plugins track the editor's API (aerial 4.0 dropped nvim < 0.12, and
+    # nvim-treesitter's grammars are built per nvim version), and a plugin list
+    # from one nixpkgs under an editor from another is how that breaks. Unstable
+    # is pinned by flake.lock like everything else, so this is a deliberate bump:
+    # `nix flake update nixpkgs-unstable` (which also moves DMS, quickshell and
+    # claude-code, taken from it too).
+    package = pkgsUnstable.neovim-unwrapped;
+
     extraPackages = with pkgs; [ ripgrep fd ];
 
     # Inlined into the generated ~/.config/nvim/init.lua; the lua/ and after/
     # trees it requires are linked below.
     initLua = builtins.readFile ../config/nvim/init.lua;
 
-    plugins = with pkgs.vimPlugins; [
+    plugins = with pkgsUnstable.vimPlugins; [
       # shared dependencies
       plenary-nvim
       nvim-web-devicons
