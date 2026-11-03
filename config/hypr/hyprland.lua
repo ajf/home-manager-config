@@ -4,10 +4,19 @@
 -- ==================
 -- STARTUP APPS
 -- ==================
+-- Run a tray app once DMS's StatusNotifierWatcher is on the bus. DMS starts a
+-- couple of seconds after the compositor, and the Electron apps (1Password,
+-- Signal) look for the watcher once, at startup: launched before it exists they
+-- never register an icon, and never retry. Waits at most 30s, so a broken tray
+-- delays nothing for long; the extra second lets the host register too.
+local function after_tray(cmd)
+    hl.exec_cmd("sh -c 'i=0; until busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1 || [ $i -ge 60 ]; do i=$((i+1)); sleep 0.5; done; sleep 1; exec " .. cmd .. "'")
+end
+
 hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
     hl.exec_cmd("systemctl --user start hyprland-session.target")
-    hl.exec_cmd("1password --silent")
+    after_tray("1password --silent")
     -- Tray-only autostarts. Each was verified to register a StatusNotifierItem
     -- without mapping a window, so none of them flashes a window on login:
     -- Signal needs the flag, the other two do it by default.
@@ -19,19 +28,19 @@ hl.on("hyprland.start", function()
     -- tray is to let the window map and then close it, which means several
     -- seconds of visible window on every login -- not worth it for a music
     -- player. closeToTray keeps it resident once opened by hand.
-    hl.exec_cmd("signal-desktop --start-in-tray")
+    after_tray("signal-desktop --start-in-tray")
     -- Tailscale tray. tailscaled's OperatorUser is andrew, so its menu can
     -- bring the tunnel up and down without asking for root.
     -- Only where installed: dotfiles.tailscaleTray = false drops the package.
     local has_tray = os.execute("command -v tail-tray >/dev/null 2>&1")
     if has_tray == true or has_tray == 0 then
-        hl.exec_cmd("tail-tray")
+        after_tray("tail-tray")
     end
     -- iPhone bridge. tether-gtk is the tray client and spawns tetherd itself
     -- when none is running, so there is no separate daemon to start -- see the
     -- comments in the package's own tetherd.service. The binary comes from the
     -- system closure (NixOS), not from this repo.
-    hl.exec_cmd("tether-gtk")
+    after_tray("tether-gtk")
     -- hypridle runs as a systemd user unit (see modules/linux.nix)
     -- polkit agent handled by home-manager (services.hyprpolkitagent)
     hl.exec_cmd("hyprsunset -t 4500")
