@@ -64,14 +64,7 @@ in
       # a read-only store link, which breaks `gh auth login`'s config writes.
       gh
       _1password-cli # `op`; the tmux 1password plugin and SSH/signing flows use it
-
-      # sops-nix toolchain. sops edits the encrypted files, age is the cipher
-      # underneath, ssh-to-age converts a host's ssh ed25519 key into the age
-      # recipient that sops.age.sshKeyPaths will decrypt with.
-      sops
-      age
-      ssh-to-age
-
+      # sops/age toolchain lives in modules/sops.nix, with the user identity
       zoxide
       yazi # TUI file manager
       rustup
@@ -107,12 +100,6 @@ in
     # on the NixOS fleet; this follows the user to any other machine.
     home.sessionVariables.LIBPROC_HIDE_KERNEL = "1";
 
-    # Without this sops resolves its age key through Go's UserConfigDir, which
-    # on darwin is ~/Library/Application Support -- not ~/.config -- so a key at
-    # the XDG path is silently not found and every decrypt fails with "none
-    # were successful". Pinned so the path is the same on every platform.
-    home.sessionVariables.SOPS_AGE_KEY_FILE =
-      "${config.xdg.configHome}/sops/age/keys.txt";
 
     programs.bat.enable = true;
 
