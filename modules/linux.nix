@@ -155,7 +155,6 @@ lib.mkMerge [
       # session installs these; Hyprland does not. Same shape as kservice above.
       kdePackages.kio
       cider-2' # Apple Music client; wrapped with libpulse (see above)
-      obsidian
       slack
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
       dropbox # GUI client + tray; the daemon lives in the store, not ~/.dropbox-dist

@@ -55,9 +55,12 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("hyprsunset -t 4500")
     hl.exec_cmd("foot --title quake")
     hl.exec_cmd("wl-paste --watch cliphist store")
-    -- Obsidian must be RUNNING for Sync to flow — Claude writes memory into
-    -- the vault headlessly; this is what actually ships it to other devices.
-    hl.exec_cmd("obsidian")
+    -- The editor. Sync does not need it open: where dotfiles.obsidianSync is on
+    -- the headless client ships the vault (see modules/obsidian-sync.nix). Only
+    -- where installed: dotfiles.obsidianApp = false drops the package.
+    if installed("obsidian") then
+        hl.exec_cmd("obsidian")
+    end
 end)
 
 -- ==================

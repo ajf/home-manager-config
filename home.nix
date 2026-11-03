@@ -41,6 +41,17 @@
       '';
     };
 
+    obsidianApp = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Install the Obsidian desktop app, seed its vault registry and autostart
+        it. Disable on a desktop that keeps its vault in sync with the headless
+        client instead (dotfiles.obsidianSync) and has no use for the editor.
+        Never run both against one vault.
+      '';
+    };
+
     signal = lib.mkOption {
       type = lib.types.bool;
       default = true;

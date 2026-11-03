@@ -1,8 +1,10 @@
-# Obsidian + the standard vault (~/notes/personal, Obsidian Sync). The app
-# rewrites its vault registry (obsidian.json) at runtime, so we SEED it via
-# activation instead of managing the file read-only: create the vault dir,
-# register it if absent, then leave the file to the app. Desktop-only —
-# headless boxes can't run it and Sync never happens outside the app.
+# Obsidian + the standard vault (~/notes/personal). The app rewrites its vault
+# registry (obsidian.json) at runtime, so we SEED it via activation instead of
+# managing the file read-only: create the vault dir, register it if absent,
+# then leave the file to the app. Desktop-only (headless boxes can't run it),
+# and off where dotfiles.obsidianApp = false. Continuous sync is a separate
+# concern: modules/obsidian-sync.nix runs the headless client, and the app is
+# then only an editor -- never connect both to the same vault.
 { config, lib, pkgs, ... }:
 let
   vault = "${config.home.homeDirectory}/notes/personal";
@@ -12,7 +14,7 @@ let
     else ".config/obsidian";
 in
 {
-  config = lib.mkIf config.dotfiles.desktop.enable {
+  config = lib.mkIf (config.dotfiles.desktop.enable && config.dotfiles.obsidianApp) {
     home.packages = [ pkgs.obsidian ];
 
     # The vault dir itself is created by Obsidian Sync when the user attaches
