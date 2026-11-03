@@ -20,6 +20,24 @@ let
   cfg = config.dotfiles.sops;
 in
 {
+  options.dotfiles.sops.authoringPublicKey = lib.mkOption {
+    type = lib.types.nullOr lib.types.str;
+    default = null;
+    example = "age1abc…";
+    description = ''
+      Public half of the authoring key, so `sops-user-key` can recognise it and
+      refuse to be mistaken for a per-machine identity. Site data: supplied by
+      the identity flake, never hardcoded here.
+
+      This exists because the mistake is easy and silent. On a machine you
+      author from, the authoring key occupies the same path a user key would,
+      so `sops-user-key` reports "already exists" and prints the AUTHORING
+      key's public half -- which looks exactly like a machine identity and
+      invites pasting the master key into a recipient list, or worse,
+      overwriting it. Happened twice on 2026-11-03 (pioneer, intrepid).
+    '';
+  };
+
   options.dotfiles.sops.userKeyFile = lib.mkOption {
     type = lib.types.str;
     default = "${config.xdg.configHome}/sops/age/keys.txt";
@@ -52,10 +70,28 @@ in
     # existing identity is the only way to read whatever was encrypted to it.
     programs.fish.functions.sops-user-key = ''
       set -l keyfile ${cfg.userKeyFile}
+      set -l authoring '${if cfg.authoringPublicKey == null then "" else cfg.authoringPublicKey}'
       if test -e $keyfile
-          echo "user age key already exists at $keyfile"
-          echo "public half (this is what belongs in .sops.yaml):"
-          age-keygen -y $keyfile
+          echo "age identity file already exists at $keyfile"
+          set -l is_authoring 0
+          for p in (age-keygen -y $keyfile 2>/dev/null)
+              if test -n "$authoring" -a "$p" = "$authoring"
+                  echo "  $p  <-- AUTHORING KEY, not a per-machine identity"
+                  set is_authoring 1
+              else
+                  echo "  $p  (per-machine identity; this is what belongs in .sops.yaml)"
+              end
+          end
+          if test $is_authoring -eq 1
+              echo ""
+              echo "So this machine has NO per-machine identity, and does not need one:"
+              echo "the authoring key is a recipient of every secret, so a machine key"
+              echo "would decrypt nothing extra here. Do NOT paste the above into a"
+              echo "recipient list as <host>_user, and do NOT regenerate over it."
+              echo ""
+              echo "If this should not be an authoring machine, move the authoring key"
+              echo "off it first (keep the backup), then re-run this."
+          end
           return 0
       end
       mkdir -p (dirname $keyfile); chmod 700 (dirname $keyfile)
