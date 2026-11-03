@@ -3,33 +3,49 @@
 # Cross-platform CLI tooling (mostly ported from the old .Brewfile).
 let
   cfg = config.dotfiles.task;
+
+  # Shipped as a store file rather than a heredoc so the activation script
+  # stays trivial. Content is non-secret by construction: it is the
+  # instructions for filling the real values in, never the values.
+  syncSecretsStub = pkgs.writeText "task-sync-secrets-stub" ''
+    # Taskwarrior sync credentials -- fill these in BY HAND.
+    # Deliberately not managed by nix: the store is world-readable.
+    #
+    # Both values come from a single 1Password API Credential item, and must be
+    # reused VERBATIM on every machine: a different client_id is a separate,
+    # invisible database, and the encryption secret cannot be rotated -- a new
+    # one orphans all synced history.
+    #
+    #   sync.server.client_id=<the item's username field>
+    #   sync.encryption_secret=<the item's credential field>
+  '';
 in
 {
-  # Taskwarrior sync is a generic mechanism here; WHICH server and WHERE the
-  # credentials live is site data, supplied by the identity flake (same spirit
-  # as modules/step.nix). The secrets file itself is never managed by nix --
-  # the store is world-readable -- so it is written out of band.
+  # Taskwarrior sync is a generic mechanism here; WHICH server to talk to is
+  # site data, supplied by the identity flake (same spirit as modules/step.nix).
+  # The credentials are never managed by nix -- the store is world-readable --
+  # so they are filled in by hand; nix only guarantees the FILE exists, because
+  # taskwarrior treats an `include` of a missing file as fatal (every command
+  # exits 2, not just `task sync`). With the stub in place a machine that has
+  # not been given credentials yet degrades to just `task sync` failing.
   options.dotfiles.task = {
     syncServerUrl = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
       example = "https://task.example.com";
       description = ''
-        taskchampion-sync-server URL. Harmless on its own: taskwarrior only
-        contacts it on an explicit `task sync`.
+        taskchampion-sync-server URL. Enables the sync lines in taskrc and the
+        credentials stub. Inert until credentials are filled in: taskwarrior
+        only contacts the server on an explicit `task sync`.
       '';
     };
     syncSecretsFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/home/you/.config/task/sync.secrets";
+      type = lib.types.str;
+      default = "${config.xdg.configHome}/task/sync.secrets";
       description = ''
-        Path to a file holding sync.server.client_id and
-        sync.encryption_secret, pulled into taskrc with `include`.
-
-        Set this ONLY on machines where that file already exists: taskwarrior
-        treats an include of a missing file as fatal (every command exits 2),
-        so a premature setting here bricks the CLI rather than degrading it.
+        File holding sync.server.client_id and sync.encryption_secret, pulled
+        into taskrc with `include`. Created as a commented 0600 stub at
+        activation if absent, and never overwritten once it has content.
       '';
     };
   };
@@ -110,9 +126,22 @@ in
       builtins.readFile ../config/task/taskrc
       + lib.optionalString (cfg.syncServerUrl != null) ''
         sync.server.url=${cfg.syncServerUrl}
-      ''
-      + lib.optionalString (cfg.syncSecretsFile != null) ''
         include ${cfg.syncSecretsFile}
       '';
+
+    # The include above is only safe because this guarantees the file exists.
+    # Create-if-absent ONLY: the credentials are unrotatable (a wrong
+    # sync.encryption_secret orphans the synced history), so this must never
+    # touch a file that already has content. install -m 600 copies the stub
+    # straight to its final mode, with no world-readable window.
+    home.activation.taskSyncSecretsStub =
+      lib.mkIf (cfg.syncServerUrl != null)
+        (lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          if [ ! -e "${cfg.syncSecretsFile}" ]; then
+            run mkdir -p "$(dirname "${cfg.syncSecretsFile}")"
+            run install -m 600 ${syncSecretsStub} "${cfg.syncSecretsFile}"
+            warnEcho "taskwarrior: wrote a credentials stub at ${cfg.syncSecretsFile}; 'task sync' fails until it is filled in by hand"
+          fi
+        '');
   };
 }
