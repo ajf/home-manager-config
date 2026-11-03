@@ -3,8 +3,11 @@
 # sops/age toolchain, and where this user's age identity lives.
 #
 # nix does not generate or manage a decryption identity: the store is
-# world-readable, so a private key must never be a nix string. The identity is
-# placed by hand on the machines that need it.
+# world-readable, so a private key must never be a nix string. Each machine's
+# identity is generated ON that machine with age-keygen and never transported;
+# only its public half is published as a recipient. One key per machine, so a
+# lost machine is revoked by dropping its recipient and rekeying, rather than
+# by rotating a shared key everywhere.
 #
 # The NixOS repos work differently, and should: there each host decrypts with
 # its own /etc/ssh/ssh_host_ed25519_key via sops.age.sshKeyPaths, because root
