@@ -157,7 +157,6 @@ lib.mkMerge [
       cider-2' # Apple Music client; wrapped with libpulse (see above)
       obsidian
       slack
-      signal-desktop
       teams-for-linux' # official Linux client is discontinued; Electron wrapper
       dropbox # GUI client + tray; the daemon lives in the store, not ~/.dropbox-dist
       # RSS client that speaks Miniflux natively, so read state stays on the
@@ -177,7 +176,8 @@ lib.mkMerge [
       nerd-fonts.jetbrains-mono
       nerd-fonts.ubuntu-mono
       inter
-    ] ++ lib.optional config.dotfiles.tailscaleTray
+    ] ++ lib.optional config.dotfiles.signal pkgs.signal-desktop
+    ++ lib.optional config.dotfiles.tailscaleTray
       # Tailscale tray icon (Qt). Autostarted from hyprland.lua when installed;
       # the CLI and tailscaled itself are system-side, this is only the tray
       # client. tailscale-systray was the other candidate -- this one is

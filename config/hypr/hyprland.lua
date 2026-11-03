@@ -13,6 +13,13 @@ local function after_tray(cmd)
     hl.exec_cmd("sh -c 'i=0; until busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1 || [ $i -ge 60 ]; do i=$((i+1)); sleep 0.5; done; sleep 1; exec " .. cmd .. "'")
 end
 
+-- Whether a binary is on PATH (os.execute returns true or 0 on success,
+-- depending on the Lua flavour).
+local function installed(bin)
+    local ok = os.execute("command -v " .. bin .. " >/dev/null 2>&1")
+    return ok == true or ok == 0
+end
+
 hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
     hl.exec_cmd("systemctl --user start hyprland-session.target")
@@ -28,12 +35,14 @@ hl.on("hyprland.start", function()
     -- tray is to let the window map and then close it, which means several
     -- seconds of visible window on every login -- not worth it for a music
     -- player. closeToTray keeps it resident once opened by hand.
-    after_tray("signal-desktop --start-in-tray")
+    -- Only where installed: dotfiles.signal = false drops the package.
+    if installed("signal-desktop") then
+        after_tray("signal-desktop --start-in-tray")
+    end
     -- Tailscale tray. tailscaled's OperatorUser is andrew, so its menu can
     -- bring the tunnel up and down without asking for root.
     -- Only where installed: dotfiles.tailscaleTray = false drops the package.
-    local has_tray = os.execute("command -v tail-tray >/dev/null 2>&1")
-    if has_tray == true or has_tray == 0 then
+    if installed("tail-tray") then
         after_tray("tail-tray")
     end
     -- iPhone bridge. tether-gtk is the tray client and spawns tetherd itself

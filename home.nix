@@ -41,6 +41,16 @@
       '';
     };
 
+    signal = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Install Signal Desktop and autostart it into the tray at login.
+        Disable on machines where a personal messenger does not belong, such as
+        a work laptop.
+      '';
+    };
+
     tailscaleTray = lib.mkOption {
       type = lib.types.bool;
       default = true;
