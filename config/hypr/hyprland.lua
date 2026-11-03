@@ -53,7 +53,11 @@ hl.on("hyprland.start", function()
     -- hypridle runs as a systemd user unit (see modules/linux.nix)
     -- polkit agent handled by home-manager (services.hyprpolkitagent)
     hl.exec_cmd("hyprsunset -t 4500")
-    hl.exec_cmd("foot --title quake")
+    -- Quake terminal, parked on the special:quake workspace by its window rule
+    -- below; SUPER+grave shows and hides it.
+    -- Respawned when it exits (Ctrl+D, `exit`), or the next SUPER+grave would
+    -- toggle an empty workspace; the pause keeps a failing launch from spinning.
+    hl.exec_cmd("sh -c 'while :; do ghostty --class=io.quake.terminal --gtk-single-instance=false; sleep 1; done'")
     hl.exec_cmd("wl-paste --watch cliphist store")
     -- The editor. Sync does not need it open: where dotfiles.obsidianSync is on
     -- the headless client ships the vault (see modules/obsidian-sync.nix). Only
@@ -232,6 +236,11 @@ hl.config({
 hl.animation({ leaf = "windowsIn",   enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "windowsOut",  enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "workspaces",  enabled = true, speed = 5, bezier = "default" })
+-- Special workspaces (the quake terminal) drop down from the top instead of
+-- sliding in from the side like regular workspaces. A bare "slidevert" comes
+-- up from the bottom; the negative movement percentage flips it. Speed is in
+-- deciseconds, so lower is faster.
+hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 1.5, bezier = "default", style = "slidevert -100%" })
 hl.animation({ leaf = "windowsMove", enabled = true, speed = 4, bezier = "default" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "border",      enabled = true, speed = 3, bezier = "default" })
@@ -279,6 +288,20 @@ hl.window_rule({
     float = true,
 })
 
+-- Quake terminal: SUPER+grave drops it from the top. The window is started at
+-- login (see autostart) with this class and lives on the "quake" special
+-- workspace, which the bind below shows and hides. Floating, 60% wide and 40%
+-- of the height, centred just under the bar.
+hl.window_rule({
+    name  = "quake-terminal",
+    match = { class = "^(io\\.quake\\.terminal)$" },
+
+    workspace = "special:quake silent",
+    float     = true,
+    size      = "(monitor_w*0.6) (monitor_h*0.4)",
+    move      = "(monitor_w*0.2) 48",
+})
+
 -- DMS windows: Hyprland doesn't size these correctly so float is disabled
 -- hl.window_rule({ match = { class = "^(org%.quickshell)$" }, float = true })
 
@@ -290,7 +313,16 @@ hl.layer_rule({
 -- ==================
 -- SPECIAL BINDS
 -- ==================
-hl.bind("SUPER + grave",     hl.dsp.workspace.toggle_special("quake"))
+-- Showing the special workspace does not focus a window that has never had
+-- focus (the quake terminal is started silently at login), so focus it
+-- explicitly whenever the toggle has just shown it.
+hl.bind("SUPER + grave", function()
+    hl.dispatch(hl.dsp.workspace.toggle_special("quake"))
+    local shown = hl.get_active_special_workspace()
+    if shown and shown.name == "special:quake" then
+        hl.dispatch(hl.dsp.focus({ window = "class:^(io\\.quake\\.terminal)$" }))
+    end
+end)
 hl.bind("SUPER + backslash", hl.dsp.exec_cmd("1password --quick-access"))
 
 -- Tab switching on ALT+SHIFT+[ / ]. Firefox's own shortcuts are not
