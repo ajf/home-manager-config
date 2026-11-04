@@ -126,6 +126,12 @@ in
     # Sync lines are appended from the identity flake's site data.
     xdg.configFile."task/taskrc".text =
       builtins.readFile ../config/task/taskrc
+      # `task news` records the version it last showed in taskrc, which a
+      # read-only store file can't take; pin it to the installed version so
+      # the "Recently upgraded" nag stays quiet across upgrades.
+      + ''
+        news.version=${pkgs.taskwarrior3.version}
+      ''
       + lib.optionalString (cfg.syncServerUrl != null) ''
         sync.server.url=${cfg.syncServerUrl}
         include ${cfg.syncSecretsFile}
