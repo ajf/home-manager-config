@@ -19,6 +19,8 @@
     enable = true;
 
     shellAliases.more = "less";
+    shellAliases.t = "task";
+    shellAliases.tt = "taskwarrior-tui";
 
     shellInit = ''
       # The desktop session exports __HM_SESS_VARS_SOURCED at login, which
