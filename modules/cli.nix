@@ -131,6 +131,8 @@ in
         include ${cfg.syncSecretsFile}
       '';
 
+    xdg.configFile."task/tokyonight-storm.theme".source = ../config/task/tokyonight-storm.theme;
+
     # The include above is only safe because this guarantees the file exists.
     # Create-if-absent ONLY: the credentials are unrotatable (a wrong
     # sync.encryption_secret orphans the synced history), so this must never

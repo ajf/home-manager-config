@@ -1,4 +1,4 @@
 data.location=~/.local/share/task
 hooks.location=~/.config/task/hooks
 
-include dark-gray-blue-256.theme
+include ~/.config/task/tokyonight-storm.theme

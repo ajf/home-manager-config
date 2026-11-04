@@ -1,0 +1,67 @@
+# TokyoNight Storm for taskwarrior and taskwarrior-tui.
+#
+# Uses the named ANSI colors rather than the 256-color cube, so it renders
+# as exact Tokyo Night Storm under a terminal whose palette is TokyoNight
+# Storm (ghostty, foot, tmux inside either). Mapping:
+#   red #f7768e  green #9ece6a  yellow #e0af68  blue #7aa2f7
+#   magenta #bb9af7  cyan #7dcfff  bright black #4e5575
+
+# --- taskwarrior task rules (also drive the task list in the TUI) ---
+color.active=black on blue
+color.alternate=
+color.blocked=bright black
+color.blocking=yellow
+color.burndown.done=black on green
+color.burndown.pending=black on red
+color.burndown.started=black on yellow
+color.calendar.due=black on yellow
+color.calendar.due.today=black on red
+color.calendar.holiday=black on magenta
+color.calendar.overdue=black on red
+color.calendar.today=black on blue
+color.calendar.weekend=on bright black
+color.calendar.weeknumber=blue
+color.completed=bright black
+color.debug=cyan
+color.deleted=bright black
+color.due=yellow
+color.due.today=bold yellow
+color.error=bold red
+color.footnote=cyan
+color.header=cyan
+color.history.add=black on red
+color.history.delete=black on yellow
+color.history.done=black on green
+color.label=blue
+color.label.sort=bold blue
+color.overdue=bold red
+color.recurring=magenta
+color.scheduled=cyan
+color.summary.background=on bright black
+color.summary.bar=black on green
+color.sync.added=green
+color.sync.changed=yellow
+color.sync.rejected=red
+color.tag.next=bold cyan
+color.tagged=green
+color.uda.priority.H=bold red
+color.uda.priority.M=yellow
+color.uda.priority.L=blue
+color.until=magenta
+color.warning=bold yellow
+
+# --- taskwarrior-tui chrome ---
+uda.taskwarrior-tui.style.report.selection=white on bright black
+uda.taskwarrior-tui.style.report.scrollbar=blue
+uda.taskwarrior-tui.style.report.scrollbar.area=bright black
+uda.taskwarrior-tui.style.report-menu.active=black on blue
+uda.taskwarrior-tui.style.context.active=black on blue
+uda.taskwarrior-tui.style.calendar.title=bold blue
+uda.taskwarrior-tui.style.calendar.today=black on blue
+uda.taskwarrior-tui.style.navbar=white on bright black
+uda.taskwarrior-tui.style.command=white
+uda.taskwarrior-tui.style.command.error=bold red
+uda.taskwarrior-tui.style.title=bold magenta
+uda.taskwarrior-tui.style.title.border=bright black
+uda.taskwarrior-tui.style.help.gauge=blue
+uda.taskwarrior-tui.style.report.completion-pane=white on bright black
