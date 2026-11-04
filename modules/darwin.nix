@@ -28,12 +28,20 @@ lib.mkIf pkgs.stdenv.isDarwin {
     fi
   '';
 
-  # The shell default here is the launchd cert agent so bare `step ssh login`
-  # and friends land creds in it; 1Password still serves regular keys via
-  # IdentityAgent in the identity flake's ~/.ssh/config. An agent forwarded
-  # in over ssh wins, same as the Linux twin in config/fish/conf.d.
+  # Darwin twin of config/fish/conf.d/ssh-auth-sock.fish: a forwarded
+  # agent wins, otherwise 1Password — it holds the regular keys (GitHub,
+  # signing); ssh_config's `IdentityAgent SSH_AUTH_SOCK` for Host * follows
+  # this variable. The launchd cert agent is only a fallback: cert hosts
+  # pin its socket by path and `step-ssh-login` sets the variable itself,
+  # so nothing needs it to be the shell default — making it the default
+  # handed GitHub an agent with no keys (hm-pull fell back to a stale
+  # cached flake every time).
   xdg.configFile."fish/conf.d/ssh-auth-sock.fish".text = ''
-    if not set -q SSH_CONNECTION; or not test -S "$SSH_AUTH_SOCK"
+    if set -q SSH_CONNECTION; and test -S "$SSH_AUTH_SOCK"
+      # forwarded agent — leave it
+    else if test -S "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      set -gx SSH_AUTH_SOCK "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    else if test -S "${config.dotfiles.ssh.certAgentSocket}"
       set -gx SSH_AUTH_SOCK "${config.dotfiles.ssh.certAgentSocket}"
     end
   '';
